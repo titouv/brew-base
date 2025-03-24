@@ -47,7 +47,7 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
 
     // Sort by install count and take top 100 casks
     const topPackages = analytics365Data
-      .sort((a, b) => b.count - a.count)
+      .sort((a, b) => parseInt(b.count.replace(/,/g, '')) - parseInt(a.count.replace(/,/g, '')))
       .slice(0, 100)
       .map((item) => {
         const details = caskDetailsMap.get(item.cask);
@@ -55,9 +55,10 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
         const homepage = details?.homepage || '';
         
         // Calculate growth percentage
-        const count365d = parseInt(item.count);
-        const count90d = parseInt(analytics90Map.get(item.cask)) || 0;
+        const count365d = parseInt(item.count.replace(/,/g, ''));
+        const count90d = parseInt((analytics90Map.get(item.cask) || "0").replace(/,/g, ''));
         console.log('item.cask', item.cask);
+        console.log('item.count', analytics90Map.get(item.cask));
         console.log('count90d', count90d);
         console.log('count365d', count365d);
         
@@ -79,7 +80,7 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
           description: details?.desc || '',
           category,
           popular: true,
-          installCount: item.count,
+          installCount: parseInt(item.count.replace(/,/g, '')),
           growthPercentage: Math.round(growthPercentage * 10) / 10, // Round to 1 decimal
           iconUrl: `https://www.google.com/s2/favicons?domain=${homepage}&sz=128`
         };
