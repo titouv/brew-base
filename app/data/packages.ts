@@ -2,7 +2,7 @@ import axios from 'axios';
 
 interface AnalyticsItem {
   cask: string;
-  count: number;
+  count: string;
 }
 
 export interface BrewPackage {
