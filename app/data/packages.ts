@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+interface AnalyticsItem {
+  cask: string;
+  count: number;
+}
+
 export interface BrewPackage {
   id: string;
   name: string;
@@ -7,12 +12,12 @@ export interface BrewPackage {
   category: 'IDE & Editors' | 'Terminal & CLI' | 'Dev Tools' | 'Productivity' | 'Utilities' | 'Media' | 'Communication';
   popular: boolean;
   installCount?: number;
+  growthPercentage?: number;
   iconUrl?: string;
 }
 
-// const HOMEBREW_CASK_API_URL = 'https://formulae.brew.sh/api/analytics/cask-install/30d.json';
-// const HOMEBREW_CASK_API_URL = 'https://formulae.brew.sh/api/analytics/cask-install/90d.json';
-const HOMEBREW_CASK_API_URL = 'https://formulae.brew.sh/api/analytics/cask-install/365d.json';
+const HOMEBREW_CASK_90D_API_URL = 'https://formulae.brew.sh/api/analytics/cask-install/90d.json';
+const HOMEBREW_CASK_365D_API_URL = 'https://formulae.brew.sh/api/analytics/cask-install/365d.json';
 const HOMEBREW_CASK_DETAILS_API_URL = 'https://formulae.brew.sh/api/cask.json';
 
 interface CaskDetails {
@@ -25,28 +30,48 @@ interface CaskDetails {
 
 export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
   try {
-    // Fetch both analytics and cask details in parallel
-    const [analyticsResponse, caskDetailsResponse] = await Promise.all([
-      axios.get(HOMEBREW_CASK_API_URL),
+    // Fetch analytics and cask details in parallel
+    const [analytics365Response, analytics90Response, caskDetailsResponse] = await Promise.all([
+      axios.get(HOMEBREW_CASK_365D_API_URL),
+      axios.get(HOMEBREW_CASK_90D_API_URL),
       axios.get(HOMEBREW_CASK_DETAILS_API_URL)
     ]);
 
-    const analyticsData = analyticsResponse.data.items;
+    const analytics365Data = analytics365Response.data.items as AnalyticsItem[];
+    const analytics90Data = analytics90Response.data.items as AnalyticsItem[];
     const caskDetails = caskDetailsResponse.data as CaskDetails[];
     
-    // Create a map of cask details for faster lookup
-    const caskDetailsMap = new Map(
-      caskDetails.map((cask) => [cask.token, cask])
-    );
+    // Create maps for faster lookup
+    const caskDetailsMap = new Map(caskDetails.map((cask) => [cask.token, cask]));
+    const analytics90Map = new Map(analytics90Data.map((item) => [item.cask, item.count]));
 
-    // Sort by install count and take top 20 casks
-    const topPackages = analyticsData
-      .sort((a: any, b: any) => b.count - a.count)
+    // Sort by install count and take top 100 casks
+    const topPackages = analytics365Data
+      .sort((a, b) => b.count - a.count)
       .slice(0, 100)
-      .map((item: any) => {
+      .map((item) => {
         const details = caskDetailsMap.get(item.cask);
         const category = guessCategory(details?.desc || '');
         const homepage = details?.homepage || '';
+        
+        // Calculate growth percentage
+        const count365d = parseInt(item.count);
+        const count90d = parseInt(analytics90Map.get(item.cask)) || 0;
+        console.log('item.cask', item.cask);
+        console.log('count90d', count90d);
+        console.log('count365d', count365d);
+        
+        // Convert counts to daily rates for fair comparison
+        const dailyRate365 = count365d / 365;
+        const dailyRate90 = count90d / 90;
+        console.log('dailyRate90', dailyRate90);
+        console.log('dailyRate365', dailyRate365);
+        
+        // Calculate growth percentage
+        const growthPercentage = dailyRate90 > 0 && dailyRate365 > 0
+          ? ((dailyRate90 - dailyRate365) / dailyRate365) * 100
+          : 0;
+        console.log('growthPercentage', growthPercentage);
         
         return {
           id: item.cask,
@@ -55,6 +80,7 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
           category,
           popular: true,
           installCount: item.count,
+          growthPercentage: Math.round(growthPercentage * 10) / 10, // Round to 1 decimal
           iconUrl: `https://www.google.com/s2/favicons?domain=${homepage}&sz=128`
         };
       });

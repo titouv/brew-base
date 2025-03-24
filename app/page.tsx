@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { staticBrewPackages, BrewPackage, fetchMostUsedPackages } from './data/packages';
 
 export default function Home() {
@@ -8,6 +8,7 @@ export default function Home() {
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [packages, setPackages] = useState<BrewPackage[]>(staticBrewPackages);
   const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState<'installs' | 'growth'>('installs');
 
   useEffect(() => {
     const loadPackages = async () => {
@@ -44,9 +45,15 @@ export default function Home() {
 
   const categories = Array.from(new Set(packages.map(pkg => pkg.category)));
 
-  const filteredPackages = packages.filter(pkg => 
-    selectedCategories.size === 0 || selectedCategories.has(pkg.category)
-  );
+  const sortedAndFilteredPackages = useMemo(() => {
+    let sorted = [...packages];
+    if (sortBy === 'growth') {
+      sorted = sorted.sort((a, b) => (b.growthPercentage ?? 0) - (a.growthPercentage ?? 0));
+    } else {
+      sorted = sorted.sort((a, b) => (b.installCount ?? 0) - (a.installCount ?? 0));
+    }
+    return sorted.filter(pkg => selectedCategories.size === 0 || selectedCategories.has(pkg.category));
+  }, [packages, selectedCategories, sortBy]);
 
   const toggleCategory = (category: string) => {
     const newSelected = new Set(selectedCategories);
@@ -72,20 +79,36 @@ export default function Home() {
       </div>
 
       {!loading && (
-        <div className="mb-6 flex flex-wrap gap-2 justify-center">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => toggleCategory(category)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all
-                ${selectedCategories.has(category)
-                  ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
-                }`}
-            >
-              {category}
-            </button>
-          ))}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => toggleCategory(category)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all
+                    ${selectedCategories.has(category)
+                      ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm'
+                      : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
+                    }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="sort" className="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
+              <select
+                id="sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'installs' | 'growth')}
+                className="px-3 py-1.5 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm"
+              >
+                <option value="installs">Most Installed</option>
+                <option value="growth">Fastest Growing</option>
+              </select>
+            </div>
+          </div>
         </div>
       )}
 
@@ -93,7 +116,7 @@ export default function Home() {
         <div className="text-center text-gray-500 dark:text-gray-400">Loading most used packages...</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPackages.map((pkg) => (
+          {sortedAndFilteredPackages.map((pkg) => (
             <div
               key={pkg.id}
               className={`p-6 rounded-lg transition-all cursor-default
@@ -108,7 +131,7 @@ export default function Home() {
                   <img
                     src={pkg.iconUrl}
                     alt={`${pkg.name} icon`}
-                    className="w-8 h-8 rounded-lg "
+                    className="w-8 h-8 rounded-lg"
                     onError={(e) => (e.currentTarget.style.display = 'none')}
                   />
                 )}
@@ -122,10 +145,15 @@ export default function Home() {
                   {pkg.installCount.toLocaleString()} installations in the last year
                 </p>
               )}
-              <div className="mt-2">
+              <div className="mt-2 flex justify-between items-center">
                 <span className="inline-block px-2 py-0.5 text-xs rounded-md bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                   {pkg.category}
                 </span>
+                {pkg.growthPercentage !== undefined && (
+                  <span className={`text-xs font-medium ${pkg.growthPercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {pkg.growthPercentage >= 0 ? '+' : ''}{pkg.growthPercentage.toFixed(1)}% growth
+                  </span>
+                )}
               </div>
             </div>
           ))}
