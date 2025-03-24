@@ -68,7 +68,7 @@ export default function Home() {
   return (
     <div className="min-h-screen p-8 max-w-7xl mx-auto">
       <header className="text-center mb-12">
-        <h1 className="text-4xl font-medium mb-4">Brew Package Composer</h1>
+        <h1 className="text-4xl font-medium mb-4">BrewBase</h1>
         <p className="text-lg text-gray-500 dark:text-gray-400">
           Select the packages you want to install on your Mac
         </p>
