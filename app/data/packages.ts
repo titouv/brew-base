@@ -93,6 +93,29 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
   }
 }
 
+// Add a cache to avoid refetching data too frequently
+let cachedPackages: BrewPackage[] | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+
+export async function getPackages(): Promise<BrewPackage[]> {
+  // Use cache if available and not expired
+  const now = Date.now();
+  if (cachedPackages && (now - lastFetchTime) < CACHE_DURATION) {
+    return cachedPackages;
+  }
+
+  try {
+    const packages = await fetchMostUsedPackages();
+    cachedPackages = packages;
+    lastFetchTime = now;
+    return packages;
+  } catch (error) {
+    console.error('Error fetching packages:', error);
+    return staticBrewPackages;
+  }
+}
+
 function guessCategory(description: string): BrewPackage['category'] {
   const lowerDesc = description.toLowerCase();
   
