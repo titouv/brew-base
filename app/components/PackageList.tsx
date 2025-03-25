@@ -58,8 +58,15 @@ export default function PackageList({ initialPackages }: PackageListProps) {
 
   return (
     <>
-      <div className="mb-8 p-4 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 backdrop-blur-xl shadow-sm flex justify-between items-center">
-        <code className="text-sm font-mono text-gray-700 dark:text-gray-300">{getBrewCommand()}</code>
+      <div className="mb-8 p-4 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 backdrop-blur-xl shadow-sm flex justify-between items-center relative group">
+        <code className={`text-sm font-mono ${selectedPackages.size === 0 ? 'text-gray-400 dark:text-gray-600' : 'text-gray-700 dark:text-gray-300'}`}>
+          {getBrewCommand()}
+        </code>
+        {selectedPackages.size === 0 && (
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+            Select packages to generate a valid command
+          </div>
+        )}
         <div className="relative">
           <button
             onClick={() => setShowCopyOptions(!showCopyOptions)}
