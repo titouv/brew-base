@@ -3,7 +3,21 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent: #007aff;
+  --accent-dark: #0062cc;
   --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+  
+  /* macOS UI Variables */
+  --card-bg: rgba(250, 250, 250, 0.8);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-hover: rgba(255, 255, 255, 0.95);
+  --card-shadow: rgba(0, 0, 0, 0.05);
+  --menu-bg: rgba(255, 255, 255, 0.9);
+  --button-bg: rgba(239, 239, 239, 0.9);
+  --button-hover: rgba(229, 229, 229, 0.9);
+  --button-active: rgba(219, 219, 219, 0.9);
+  --sidebar-bg: rgba(242, 242, 247, 0.6);
+  --backdrop-blur: 20px;
 }
 
 @theme inline {
@@ -13,10 +27,81 @@
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+  
+  /* macOS-style utilities */
+  .macos-blur {
+    backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
+  }
+  
+  .macos-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px var(--card-shadow);
+    backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
+    transition: all 0.2s ease;
+  }
+  
+  .macos-card:hover {
+    background-color: var(--card-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px var(--card-shadow);
+  }
+  
+  .macos-button {
+    background-color: var(--button-bg);
+    color: #000000;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--card-border);
+    transition: all 0.15s ease;
+  }
+  
+  .macos-button:hover {
+    background-color: var(--button-hover);
+  }
+  
+  .macos-button:active {
+    background-color: var(--button-active);
+    transform: scale(0.98);
+  }
+  
+  .macos-button-primary {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+  }
+  
+  .macos-button-primary:hover {
+    background-color: var(--accent-dark);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1e1e1e;
+    --foreground: #e0e0e0;
+    --card-bg: rgba(40, 40, 40, 0.8);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-hover: rgba(50, 50, 50, 0.9);
+    --card-shadow: rgba(0, 0, 0, 0.2);
+    --menu-bg: rgba(40, 40, 40, 0.95);
+    --button-bg: rgba(60, 60, 60, 0.8);
+    --button-hover: rgba(70, 70, 70, 0.8);
+    --button-active: rgba(50, 50, 50, 0.8);
+    --sidebar-bg: rgba(40, 40, 40, 0.8);
   }
 }
 

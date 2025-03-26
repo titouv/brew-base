@@ -61,22 +61,15 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
         // Calculate growth percentage
         const count365d = parseInt(item.count.replace(/,/g, ''));
         const count90d = parseInt((analytics90Map.get(item.cask) || "0").replace(/,/g, ''));
-        console.log('item.cask', item.cask);
-        console.log('item.count', analytics90Map.get(item.cask));
-        console.log('count90d', count90d);
-        console.log('count365d', count365d);
         
         // Convert counts to daily rates for fair comparison
         const dailyRate365 = count365d / 365;
         const dailyRate90 = count90d / 90;
-        console.log('dailyRate90', dailyRate90);
-        console.log('dailyRate365', dailyRate365);
         
         // Calculate growth percentage
         const growthPercentage = dailyRate90 > 0 && dailyRate365 > 0
           ? ((dailyRate90 - dailyRate365) / dailyRate365) * 100
           : 0;
-        console.log('growthPercentage', growthPercentage);
         
         return {
           id: item.cask,
