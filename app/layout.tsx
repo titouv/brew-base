@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning >
       <body
-        className={`antialiased font-sans`}
+        className={`antialiased font-sans overflow-y-scroll`}
         suppressHydrationWarning
       >
         {children}

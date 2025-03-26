@@ -153,7 +153,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center mb-4">
           <div>
-            <div className="flex flex-wrap gap-2 mb-2">
+            {/* <div className="flex flex-wrap gap-2 mb-2">
               {categories.map((category) => (
                 <button
                   key={category}
@@ -163,6 +163,22 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                       selectedCategories.has(category)
                         ? "bg-blue-500/90 text-white dark:text-white border-none"
                         : "macos-button"
+                    }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div> */}
+            <div className="flex flex-wrap gap-2 mb-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => toggleCategory(category)}
+                  className={`px-4 py-1.5 text-sm font-medium transition-all macos-blur rounded-md
+                    ${
+                      selectedCategories.has(category)
+                        ? "bg-blue-500/90 border border-white/10 text-white dark:text-white"
+                        : "bg-neutral-700 border border-neutral-600"
                     }`}
                 >
                   {category}
