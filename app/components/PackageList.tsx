@@ -182,7 +182,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
 
           <div className="flex items-center">
             {selectedPackages.size > 0 && (
-              <div className="mr-4 px-2.5 py-1 bg-blue-100/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-full macos-blur">
+              <div className="mr-4 px-2.5 py-1 bg-blue-100/80 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-full macos-blur whitespace-nowrap">
                 {selectedPackages.size}{" "}
                 {selectedPackages.size === 1 ? "package" : "packages"} selected
               </div>
