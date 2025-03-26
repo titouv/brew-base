@@ -49,6 +49,10 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
     const topPackages = analytics365Data
       .sort((a, b) => parseInt(b.count.replace(/,/g, '')) - parseInt(a.count.replace(/,/g, '')))
       .slice(0, 100)
+      .filter((item) => {
+        const details = caskDetailsMap.get(item.cask);
+        return details && details.token === item.cask && details.desc && details.homepage;
+      })
       .map((item) => {
         const details = caskDetailsMap.get(item.cask);
         const category = guessCategory(details?.desc || '');
