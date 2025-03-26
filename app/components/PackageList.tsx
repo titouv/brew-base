@@ -90,12 +90,12 @@ export default function PackageList({ initialPackages }: PackageListProps) {
     <>
       <div className="mb-8 p-4 macos-card macos-blur flex justify-between items-center relative group">
         <code
-          className={`text-sm font-mono ${selectedPackages.size === 0 ? "text-gray-400 dark:text-gray-600" : "text-gray-700 dark:text-gray-300"}`}
+          className={`text-sm font-mono ${selectedPackages.size === 0 ? "text-neutral-400 dark:text-neutral-600" : "text-neutral-700 dark:text-neutral-300"}`}
         >
           {getBrewCommand()}
         </code>
         {selectedPackages.size === 0 && (
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-2 py-1 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap macos-blur">
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 px-2 py-1 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap macos-blur">
             Select packages to generate a valid command
           </div>
         )}
@@ -112,8 +112,8 @@ export default function PackageList({ initialPackages }: PackageListProps) {
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                <Copy className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                <ChevronDown className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
               </>
             )}
           </button>
@@ -124,12 +124,12 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                   onClick={() =>
                     copyToClipboard(getBrewCommand(false), "standard")
                   }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100/60 dark:hover:bg-gray-700/60 flex items-center gap-2"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/60 dark:hover:bg-neutral-700/60 flex items-center gap-2"
                 >
-                  <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                   <span>
                     Copy{" "}
-                    <span className="text-gray-500 dark:text-gray-400">
+                    <span className="text-neutral-500 dark:text-neutral-400">
                       brew install
                     </span>{" "}
                     command
@@ -139,9 +139,9 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                   onClick={() =>
                     copyToClipboard(getBrewCommand(true), "withInstall")
                   }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100/60 dark:hover:bg-gray-700/60 flex items-center gap-2"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/60 dark:hover:bg-neutral-700/60 flex items-center gap-2"
                 >
-                  <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                   <span>Copy with Homebrew installation</span>
                 </button>
               </div>
@@ -190,7 +190,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             <div className="flex items-center gap-2">
               <label
                 htmlFor="sort"
-                className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-nowrap"
               >
                 Sort by:
               </label>
@@ -218,15 +218,15 @@ export default function PackageList({ initialPackages }: PackageListProps) {
               className="p-6 macos-card macos-blur animate-pulse"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-md bg-gray-200/70 dark:bg-gray-800/70"></div>
-                <div className="h-5 bg-gray-200/70 dark:bg-gray-800/70 rounded w-1/2"></div>
+                <div className="w-10 h-10 rounded-md bg-neutral-200/70 dark:bg-neutral-800/70"></div>
+                <div className="h-5 bg-neutral-200/70 dark:bg-neutral-800/70 rounded w-1/2"></div>
               </div>
-              <div className="h-4 bg-gray-200/70 dark:bg-gray-800/70 rounded mb-2 w-3/4"></div>
-              <div className="h-4 bg-gray-200/70 dark:bg-gray-800/70 rounded mb-3 w-full"></div>
-              <div className="h-3 bg-gray-200/70 dark:bg-gray-800/70 rounded mb-3 w-1/3"></div>
+              <div className="h-4 bg-neutral-200/70 dark:bg-neutral-800/70 rounded mb-2 w-3/4"></div>
+              <div className="h-4 bg-neutral-200/70 dark:bg-neutral-800/70 rounded mb-3 w-full"></div>
+              <div className="h-3 bg-neutral-200/70 dark:bg-neutral-800/70 rounded mb-3 w-1/3"></div>
               <div className="flex justify-between items-center">
-                <div className="h-5 bg-gray-200/70 dark:bg-gray-800/70 rounded-full w-1/4"></div>
-                <div className="h-4 bg-gray-200/70 dark:bg-gray-800/70 rounded w-1/6"></div>
+                <div className="h-5 bg-neutral-200/70 dark:bg-neutral-800/70 rounded-full w-1/4"></div>
+                <div className="h-4 bg-neutral-200/70 dark:bg-neutral-800/70 rounded w-1/6"></div>
               </div>
             </div>
           ))}
@@ -236,7 +236,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full macos-card mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-8 h-8 text-gray-500 dark:text-gray-400"
+              className="w-8 h-8 text-neutral-500 dark:text-neutral-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -250,7 +250,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             </svg>
           </div>
           <h3 className="text-lg font-medium mb-2">No packages found</h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
+          <p className="text-neutral-500 dark:text-neutral-400 mb-4">
             Try removing filters or changing the search criteria
           </p>
           {selectedCategories.size > 0 && (
@@ -298,17 +298,17 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 )}
                 <h3 className="text-lg font-medium">{pkg.name}</h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-3 line-clamp-2">
                 {pkg.description || "No description available"}
               </p>
               {pkg.installCount && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
                   {pkg.installCount.toLocaleString()} installations in the last
                   year
                 </p>
               )}
               <div className="mt-3 flex justify-between items-center">
-                <span className="inline-block px-2.5 py-1 text-xs font-medium rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 macos-blur">
+                <span className="inline-block px-2.5 py-1 text-xs font-medium rounded-full bg-neutral-100/80 dark:bg-neutral-700/80 text-neutral-600 dark:text-neutral-300 macos-blur">
                   {pkg.category}
                 </span>
                 {pkg.growthPercentage !== undefined && (
