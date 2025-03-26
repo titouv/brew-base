@@ -61,7 +61,7 @@
   
   .macos-button {
     background-color: var(--button-bg);
-    color: #000000;
+    color: var(--foreground);
     font-weight: 500;
     border-radius: 6px;
     padding: 0.5rem 1rem;

@@ -159,10 +159,10 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 <button
                   key={category}
                   onClick={() => toggleCategory(category)}
-                  className={`px-4 py-1.5 text-sm font-medium transition-all macos-blur
+                  className={`px-4 py-1.5 text-sm font-medium transition-all macos-blur rounded-md
                     ${
                       selectedCategories.has(category)
-                        ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm rounded-full"
+                        ? "bg-blue-500/90 text-white dark:text-white border-none"
                         : "macos-button"
                     }`}
                 >
