@@ -102,14 +102,13 @@ export default function PackageList({ initialPackages }: PackageListProps) {
         <div className="relative">
           <button
             onClick={() => setShowCopyOptions(!showCopyOptions)}
-            className={`p-2 ${copiedCommand ? "bg-green-100/80 dark:bg-green-900/30 text-green-700 dark:text-green-400" : "macos-button"} flex items-center gap-1`}
+            className={`p-2 ${copiedCommand ? "bg-green-100/80 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-md" : "macos-button"} flex items-center gap-1`}
             title="Copy options"
             disabled={selectedPackages.size === 0}
           >
             {copiedCommand ? (
               <>
-                <span className="text-xs font-medium mr-1">Copied!</span>
-                <Copy className="w-4 h-4" />
+<span className="text-xs font-medium mr-1">Copied!</span>
               </>
             ) : (
               <>
@@ -119,7 +118,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             )}
           </button>
           {showCopyOptions && (
-            <div className="absolute right-0 mt-2 w-72 macos-card macos-blur z-10 overflow-hidden animate-fadeIn">
+            <div className="absolute right-0 bottom-full mb-2 w-72 macos-card macos-blur z-10 overflow-hidden animate-fadeIn">
               <div className="py-1">
                 <button
                   onClick={() =>
