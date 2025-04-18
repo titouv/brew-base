@@ -17,16 +17,16 @@ interface PackageListProps {
 
 export default function PackageList({ initialPackages }: PackageListProps) {
   const [selectedPackages, setSelectedPackages] = useState<Set<string>>(
-    new Set(),
+    new Set()
   );
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set(),
+    new Set()
   );
   const [sortBy, setSortBy] = useState<"installs" | "growth">("installs");
   const [showCopyOptions, setShowCopyOptions] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(
-    initialPackages.length === 0,
+    initialPackages.length === 0
   );
 
   const togglePackage = (packageId: string) => {
@@ -58,23 +58,23 @@ export default function PackageList({ initialPackages }: PackageListProps) {
   };
 
   const categories = Array.from(
-    new Set(initialPackages.map((pkg) => pkg.category)),
+    new Set(initialPackages.map((pkg) => pkg.category))
   );
 
   const sortedAndFilteredPackages = useMemo(() => {
     let sorted = [...initialPackages];
     if (sortBy === "growth") {
       sorted = sorted.sort(
-        (a, b) => (b.growthPercentage ?? 0) - (a.growthPercentage ?? 0),
+        (a, b) => (b.growthPercentage ?? 0) - (a.growthPercentage ?? 0)
       );
     } else {
       sorted = sorted.sort(
-        (a, b) => (b.installCount ?? 0) - (a.installCount ?? 0),
+        (a, b) => (b.installCount ?? 0) - (a.installCount ?? 0)
       );
     }
     return sorted.filter(
       (pkg) =>
-        selectedCategories.size === 0 || selectedCategories.has(pkg.category),
+        selectedCategories.size === 0 || selectedCategories.has(pkg.category)
     );
   }, [initialPackages, selectedCategories, sortBy]);
 
@@ -92,7 +92,11 @@ export default function PackageList({ initialPackages }: PackageListProps) {
     <>
       <div className="mb-8 p-4 macos-card macos-blur flex justify-between items-center relative group rounded-xl shadow-sm border border-neutral-200/40 dark:border-neutral-700/40">
         <code
-          className={`text-sm font-mono ${selectedPackages.size === 0 ? "text-neutral-400 dark:text-neutral-600" : "text-neutral-700 dark:text-neutral-300"}`}
+          className={`text-sm font-mono ${
+            selectedPackages.size === 0
+              ? "text-neutral-400 dark:text-neutral-600"
+              : "text-neutral-700 dark:text-neutral-300"
+          }`}
         >
           {getBrewCommand()}
         </code>
@@ -309,7 +313,11 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 </span>
                 {pkg.growthPercentage !== undefined && (
                   <span
-                    className={`text-xs font-medium flex items-center ${pkg.growthPercentage >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
+                    className={`text-xs font-medium flex items-center ${
+                      pkg.growthPercentage >= 0
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
                   >
                     {pkg.growthPercentage >= 0 ? "+" : ""}
                     {pkg.growthPercentage.toFixed(1)}%

@@ -53,10 +53,10 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
 
     // Create maps for faster lookup
     const caskDetailsMap = new Map(
-      caskDetails.map((cask) => [cask.token, cask]),
+      caskDetails.map((cask) => [cask.token, cask])
     );
     const analytics90Map = new Map(
-      analytics90Data.map((item) => [item.cask, item.count]),
+      analytics90Data.map((item) => [item.cask, item.count])
     );
 
     // Sort by install count and take top 100 casks
@@ -64,7 +64,7 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
       .sort(
         (a, b) =>
           parseInt(b.count.replace(/,/g, "")) -
-          parseInt(a.count.replace(/,/g, "")),
+          parseInt(a.count.replace(/,/g, ""))
       )
       .slice(0, 100)
       .filter((item) => {
@@ -84,7 +84,7 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
         // Calculate growth percentage
         const count365d = parseInt(item.count.replace(/,/g, ""));
         const count90d = parseInt(
-          (analytics90Map.get(item.cask) || "0").replace(/,/g, ""),
+          (analytics90Map.get(item.cask) || "0").replace(/,/g, "")
         );
 
         // Convert counts to daily rates for fair comparison
