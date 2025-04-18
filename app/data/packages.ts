@@ -105,7 +105,7 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
           popular: true,
           installCount: parseInt(item.count.replace(/,/g, "")),
           growthPercentage: Math.round(growthPercentage * 10) / 10, // Round to 1 decimal
-          iconUrl: `https://www.google.com/s2/favicons?domain=${homepage}&sz=128`,
+          iconUrl: `https://icon.horse/icon/${new URL(homepage).hostname}`,
         };
       });
 
