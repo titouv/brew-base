@@ -90,7 +90,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
 
   return (
     <>
-      <div className="mb-8 p-4 macos-card macos-blur flex justify-between items-center relative group rounded-xl shadow-sm border border-neutral-200/40 dark:border-neutral-700/40">
+      <div className="sticky top-4 z-20 mb-8 p-4 macos-card macos-blur flex justify-between items-center relative group rounded-xl shadow-sm border border-neutral-200/40 dark:border-neutral-700/40 backdrop-blur-xl">
         <code
           className={`text-sm font-mono ${
             selectedPackages.size === 0
