@@ -129,13 +129,13 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             )}
           </button>
           {showCopyOptions && (
-            <div className="absolute right-0 bottom-full mb-2 w-72 macos-card macos-blur z-10 overflow-hidden animate-fadeIn rounded-lg shadow-lg border border-neutral-200/60 dark:border-neutral-700/60 backdrop-blur-xl">
+            <div className="absolute right-0 top-full mt-2 w-72 macos-card macos-blur z-10 overflow-hidden animate-fadeIn rounded-lg shadow-lg border border-neutral-200/60 dark:border-neutral-700/60 backdrop-blur-xl bg-neutral-800!">
               <div className="py-1">
                 <button
                   onClick={() =>
                     copyToClipboard(getBrewCommand(false), "standard")
                   }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 flex items-center gap-2 transition-colors"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 flex items-center gap-2 transition-colors"
                 >
                   <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                   <span>
@@ -150,7 +150,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                   onClick={() =>
                     copyToClipboard(getBrewCommand(true), "withInstall")
                   }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 flex items-center gap-2 transition-colors"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 flex items-center gap-2 transition-colors"
                 >
                   <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                   <span>Copy with Homebrew installation</span>
