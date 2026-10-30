@@ -31,6 +31,37 @@ const compact = new Intl.NumberFormat("en", {
 const focusRing =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60";
 
+function PackageIcon({ name, iconUrl }: { name: string; iconUrl?: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!iconUrl || failed) {
+    return (
+      <span
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-neutral-500/15 text-lg font-semibold text-neutral-500 dark:text-neutral-400"
+        aria-hidden
+      >
+        {name.charAt(0).toUpperCase()}
+      </span>
+    );
+  }
+
+  // The padded tile gives full-bleed and transparent icons the same breathing room.
+  return (
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={iconUrl}
+        alt=""
+        className="h-full w-full rounded-md object-contain"
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
+      />
+    </span>
+  );
+}
+
 export default function PackageList({ initialPackages }: PackageListProps) {
   const [selectedPackages, setSelectedPackages] = useState<Set<string>>(
     new Set()
@@ -356,17 +387,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 </span>
 
                 <div className="mb-3 flex items-center gap-3 pr-8">
-                  {pkg.iconUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={pkg.iconUrl}
-                      alt=""
-                      className="h-11 w-11 shrink-0 rounded-xl object-contain shadow-sm"
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => (e.currentTarget.style.display = "none")}
-                    />
-                  ) : null}
+                  <PackageIcon name={pkg.name} iconUrl={pkg.iconUrl} />
                   <div className="min-w-0">
                     <h3 className="truncate text-base font-semibold leading-tight">
                       {pkg.name}

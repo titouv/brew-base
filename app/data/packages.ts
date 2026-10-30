@@ -1,4 +1,5 @@
 import axios from "axios";
+import { resolveIconUrl } from "./icons";
 
 interface AnalyticsItem {
   cask: string;
@@ -60,7 +61,7 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
     );
 
     // Sort by install count and take top 100 casks
-    const topPackages = analytics365Data
+    const topCasks = analytics365Data
       .sort(
         (a, b) =>
           parseInt(b.count.replace(/,/g, "")) -
@@ -75,8 +76,10 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
           details.desc &&
           details.homepage
         );
-      })
-      .map((item) => {
+      });
+
+    const topPackages = await Promise.all(
+      topCasks.map(async (item): Promise<BrewPackage> => {
         const details = caskDetailsMap.get(item.cask);
         const category = guessCategory(details?.desc || "");
         const homepage = details?.homepage || "";
@@ -105,9 +108,10 @@ export async function fetchMostUsedPackages(): Promise<BrewPackage[]> {
           popular: true,
           installCount: parseInt(item.count.replace(/,/g, "")),
           growthPercentage: Math.round(growthPercentage * 10) / 10, // Round to 1 decimal
-          iconUrl: `https://icon.horse/icon/${new URL(homepage).hostname}`,
+          iconUrl: await resolveIconUrl(homepage),
         };
-      });
+      })
+    );
 
     return topPackages;
   } catch (error) {
