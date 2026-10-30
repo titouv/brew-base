@@ -8,12 +8,28 @@ import {
   Copy,
   ChevronDown,
   CheckIcon,
+  SearchIcon,
   XIcon,
 } from "lucide-react";
 
 interface PackageListProps {
   initialPackages: BrewPackage[];
 }
+
+type SortBy = "installs" | "growth";
+
+const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+  { value: "installs", label: "Most installed" },
+  { value: "growth", label: "Fastest growing" },
+];
+
+const compact = new Intl.NumberFormat("en", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60";
 
 export default function PackageList({ initialPackages }: PackageListProps) {
   const [selectedPackages, setSelectedPackages] = useState<Set<string>>(
@@ -22,7 +38,8 @@ export default function PackageList({ initialPackages }: PackageListProps) {
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     new Set()
   );
-  const [sortBy, setSortBy] = useState<"installs" | "growth">("installs");
+  const [sortBy, setSortBy] = useState<SortBy>("installs");
+  const [query, setQuery] = useState("");
   const [showCopyOptions, setShowCopyOptions] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
 
@@ -54,26 +71,34 @@ export default function PackageList({ initialPackages }: PackageListProps) {
       : baseCommand;
   };
 
-  const categories = Array.from(
-    new Set(initialPackages.map((pkg) => pkg.category))
-  );
-
-  const sortedAndFilteredPackages = useMemo(() => {
-    let sorted = [...initialPackages];
-    if (sortBy === "growth") {
-      sorted = sorted.sort(
-        (a, b) => (b.growthPercentage ?? 0) - (a.growthPercentage ?? 0)
-      );
-    } else {
-      sorted = sorted.sort(
-        (a, b) => (b.installCount ?? 0) - (a.installCount ?? 0)
-      );
+  const categories = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const pkg of initialPackages) {
+      counts.set(pkg.category, (counts.get(pkg.category) ?? 0) + 1);
     }
-    return sorted.filter(
-      (pkg) =>
-        selectedCategories.size === 0 || selectedCategories.has(pkg.category)
-    );
-  }, [initialPackages, selectedCategories, sortBy]);
+    return Array.from(counts, ([name, count]) => ({ name, count }));
+  }, [initialPackages]);
+
+  // Rank follows the active sort over the full list, so it stays stable while filtering.
+  const sorted = useMemo(() => {
+    const key = sortBy === "growth" ? "growthPercentage" : "installCount";
+    return [...initialPackages].sort((a, b) => (b[key] ?? 0) - (a[key] ?? 0));
+  }, [initialPackages, sortBy]);
+
+  const visiblePackages = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return sorted
+      .map((pkg, index) => ({ pkg, rank: index + 1 }))
+      .filter(
+        ({ pkg }) =>
+          (selectedCategories.size === 0 ||
+            selectedCategories.has(pkg.category)) &&
+          (needle === "" ||
+            pkg.name.toLowerCase().includes(needle) ||
+            pkg.id.toLowerCase().includes(needle) ||
+            pkg.description?.toLowerCase().includes(needle))
+      );
+  }, [sorted, selectedCategories, query]);
 
   const toggleCategory = (category: string) => {
     const newSelected = new Set(selectedCategories);
@@ -85,257 +110,312 @@ export default function PackageList({ initialPackages }: PackageListProps) {
     setSelectedCategories(newSelected);
   };
 
+  const hasFilters = selectedCategories.size > 0 || query !== "";
+  const clearFilters = () => {
+    setSelectedCategories(new Set());
+    setQuery("");
+  };
+
   return (
     <>
-      <div className="sticky top-4 z-20 mb-8 p-4 macos-card macos-blur flex justify-between items-center gap-3 group rounded-xl shadow-sm border border-neutral-200/40 dark:border-neutral-700/40 backdrop-blur-xl">
-        <code
-          className={`text-sm font-mono min-w-0 overflow-x-auto whitespace-nowrap ${
-            selectedPackages.size === 0
-              ? "text-neutral-400 dark:text-neutral-600"
-              : "text-neutral-700 dark:text-neutral-300"
-          }`}
-        >
-          {getBrewCommand()}
-        </code>
-        {selectedPackages.size === 0 && (
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800/90 text-white dark:bg-white/90 dark:text-neutral-900 px-3 py-1.5 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap macos-blur shadow-sm backdrop-blur-md">
-            Select packages to generate a valid command
-          </div>
-        )}
-        <div
-          className="relative shrink-0"
-          onKeyDown={(e) => {
-            if (e.key === "Escape") setShowCopyOptions(false);
-          }}
-        >
-          <button
-            onClick={() => setShowCopyOptions(!showCopyOptions)}
-            className={`p-2 rounded-md transition-all duration-150 ${
-              copiedCommand
-                ? "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
-                : "hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400 active:bg-neutral-200 dark:active:bg-neutral-700"
-            } flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 disabled:opacity-40 disabled:cursor-not-allowed`}
-            title="Copy options"
-            aria-label="Copy options"
-            aria-haspopup="menu"
-            aria-expanded={showCopyOptions}
-            disabled={selectedPackages.size === 0}
+      <div className="sticky top-4 z-20 mb-8 rounded-2xl bg-neutral-900/95 text-neutral-100 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
+        <div className="flex items-center gap-3 p-3 pl-5">
+          <span
+            className="select-none font-mono text-sm text-emerald-400"
+            aria-hidden
           >
-            {copiedCommand ? (
-              <>
-                <CheckIcon className="w-4 h-4" />
-                <span className="text-xs font-medium">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                <ChevronDown className="w-4 h-4" />
-              </>
+            $
+          </span>
+          <code
+            className={`min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-sm font-mono ${
+              selectedPackages.size === 0
+                ? "text-neutral-500"
+                : "text-neutral-100"
+            }`}
+          >
+            {getBrewCommand()}
+            {selectedPackages.size === 0 && (
+              <span className="ml-2 font-sans text-xs text-neutral-500">
+                ← select apps below
+              </span>
             )}
-          </button>
-          {showCopyOptions && (
-            <div
-              role="menu"
-              className="absolute right-0 top-full mt-2 w-72 z-10 overflow-hidden animate-fadeIn rounded-lg shadow-lg border border-neutral-200/60 dark:border-neutral-700/60 backdrop-blur-xl bg-white/95 dark:bg-neutral-800/95 text-neutral-800 dark:text-neutral-100"
+          </code>
+          {selectedPackages.size > 0 && (
+            <button
+              onClick={() => setSelectedPackages(new Set())}
+              className={`hidden shrink-0 rounded-lg px-2.5 py-1.5 text-xs text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100 sm:block ${focusRing}`}
             >
-              <div className="py-1">
-                <button
-                  role="menuitem"
-                  onClick={() =>
-                    copyToClipboard(getBrewCommand(false), "standard")
-                  }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 focus-visible:outline-none focus-visible:bg-neutral-100/80 dark:focus-visible:bg-neutral-700/80 flex items-center gap-2 transition-colors"
-                >
-                  <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
-                  <span>
-                    Copy{" "}
-                    <span className="text-neutral-500 dark:text-neutral-400">
-                      brew install
-                    </span>{" "}
-                    command
-                  </span>
-                </button>
-                <button
-                  role="menuitem"
-                  onClick={() =>
-                    copyToClipboard(getBrewCommand(true), "withInstall")
-                  }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 focus-visible:outline-none focus-visible:bg-neutral-100/80 dark:focus-visible:bg-neutral-700/80 flex items-center gap-2 transition-colors"
-                >
-                  <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
-                  <span>Copy with Homebrew installation</span>
-                </button>
+              Clear {selectedPackages.size}
+            </button>
+          )}
+          <div
+            className="relative shrink-0"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setShowCopyOptions(false);
+            }}
+          >
+            <button
+              onClick={() => setShowCopyOptions(!showCopyOptions)}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${focusRing} ${
+                copiedCommand
+                  ? "bg-emerald-500/20 text-emerald-300"
+                  : "bg-blue-600 text-white enabled:hover:bg-blue-500 enabled:active:bg-blue-700"
+              }`}
+              title="Copy options"
+              aria-label="Copy options"
+              aria-haspopup="menu"
+              aria-expanded={showCopyOptions}
+              disabled={selectedPackages.size === 0}
+            >
+              {copiedCommand ? (
+                <>
+                  <CheckIcon className="h-4 w-4" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  Copy
+                  <ChevronDown className="h-4 w-4 opacity-70" />
+                </>
+              )}
+            </button>
+            {showCopyOptions && (
+              <div
+                role="menu"
+                className="animate-fadeIn absolute right-0 top-full z-10 mt-2 w-72 overflow-hidden rounded-xl border border-neutral-200/60 bg-white/95 text-neutral-800 shadow-xl backdrop-blur-xl dark:border-neutral-700/60 dark:bg-neutral-800/95 dark:text-neutral-100"
+              >
+                <div className="py-1">
+                  <button
+                    role="menuitem"
+                    onClick={() =>
+                      copyToClipboard(getBrewCommand(false), "standard")
+                    }
+                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-neutral-100/80 focus-visible:bg-neutral-100/80 focus-visible:outline-none dark:hover:bg-neutral-700/80 dark:focus-visible:bg-neutral-700/80"
+                  >
+                    <Copy className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                    <span>
+                      Copy{" "}
+                      <span className="text-neutral-500 dark:text-neutral-400">
+                        brew install
+                      </span>{" "}
+                      command
+                    </span>
+                  </button>
+                  <button
+                    role="menuitem"
+                    onClick={() =>
+                      copyToClipboard(getBrewCommand(true), "withInstall")
+                    }
+                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-neutral-100/80 focus-visible:bg-neutral-100/80 focus-visible:outline-none dark:hover:bg-neutral-700/80 dark:focus-visible:bg-neutral-700/80"
+                  >
+                    <Copy className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                    <span>Copy with Homebrew installation</span>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <SearchIcon
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
+              aria-hidden
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search apps…"
+              aria-label="Search apps"
+              className={`surface w-full rounded-xl py-2.5 pl-10 pr-4 text-sm placeholder:text-neutral-400 ${focusRing}`}
+            />
+          </div>
+
+          <div
+            role="group"
+            aria-label="Sort by"
+            className="surface inline-flex shrink-0 rounded-xl p-1"
+          >
+            {SORT_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setSortBy(option.value)}
+                aria-pressed={sortBy === option.value}
+                className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${focusRing} ${
+                  sortBy === option.value
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {categories.map(({ name, count }) => {
+            const active = selectedCategories.has(name);
+            return (
+              <button
+                key={name}
+                onClick={() => toggleCategory(name)}
+                aria-pressed={active}
+                className={`inline-flex items-center gap-1.5 rounded-full py-1.5 pl-3.5 pr-3 text-sm font-medium transition-colors ${focusRing} ${
+                  active
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-neutral-500/10 text-neutral-700 hover:bg-neutral-500/20 dark:text-neutral-300"
+                }`}
+              >
+                {name}
+                <span
+                  className={`text-xs tabular-nums ${
+                    active ? "text-white/70" : "text-neutral-400"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+          {hasFilters && (
+            <button
+              onClick={clearFilters}
+              className={`ml-1 rounded px-1 text-sm text-blue-600 hover:underline dark:text-blue-400 ${focusRing}`}
+            >
+              Clear filters
+            </button>
           )}
         </div>
+
+        <p
+          className="text-xs text-neutral-500 dark:text-neutral-400"
+          aria-live="polite"
+        >
+          Showing {visiblePackages.length}{" "}
+          {visiblePackages.length === 1 ? "app" : "apps"}
+          {selectedPackages.size > 0 && ` · ${selectedPackages.size} selected`}
+        </p>
       </div>
 
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row justify-between gap-4 items-start mb-4">
-          <div>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => toggleCategory(category)}
-                  aria-pressed={selectedCategories.has(category)}
-                  className={`px-4 py-1.5 text-sm font-medium transition-all rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60
-                    ${
-                      selectedCategories.has(category)
-                        ? "bg-blue-500/90 text-white shadow-sm"
-                        : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                    }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
-              Showing {sortedAndFilteredPackages.length}{" "}
-              {sortedAndFilteredPackages.length === 1 ? "package" : "packages"}
-            </p>
-
-            {selectedCategories.size > 0 && (
-              <button
-                onClick={() => setSelectedCategories(new Set())}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center">
-            {selectedPackages.size > 0 && (
-              <>
-                <div className="mr-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full whitespace-nowrap shadow-sm border border-blue-100 dark:border-blue-800/50">
-                  {selectedPackages.size}{" "}
-                  {selectedPackages.size === 1 ? "package" : "packages"} selected
-                </div>
-                <button
-                  onClick={() => setSelectedPackages(new Set())}
-                  className="mr-4 text-xs text-blue-600 dark:text-blue-400 hover:underline whitespace-nowrap rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
-                >
-                  Clear selection
-                </button>
-              </>
-            )}
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="sort"
-                className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-nowrap"
-              >
-                Sort by:
-              </label>
-              <select
-                id="sort"
-                value={sortBy}
-                onChange={(e) =>
-                  setSortBy(e.target.value as "installs" | "growth")
-                }
-                className="px-3 py-1.5 rounded-lg text-sm bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/60 focus:outline-none"
-              >
-                <option value="installs">Most Installed</option>
-                <option value="growth">Fastest Growing</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {sortedAndFilteredPackages.length === 0 ? (
+      {visiblePackages.length === 0 ? (
         <div className="py-16 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4 shadow-sm">
-            <XIcon className="w-8 h-8 text-neutral-500 dark:text-neutral-400" />
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-neutral-500/10">
+            <XIcon className="h-8 w-8 text-neutral-500 dark:text-neutral-400" />
           </div>
-          <h3 className="text-lg font-medium mb-2">No packages found</h3>
-          <p className="text-neutral-500 dark:text-neutral-400 mb-4">
-            Try removing filters or changing the search criteria
+          <h3 className="mb-2 text-lg font-medium">No apps found</h3>
+          <p className="mb-4 text-neutral-500 dark:text-neutral-400">
+            Try a different search or remove some filters.
           </p>
-          {selectedCategories.size > 0 && (
+          {hasFilters && (
             <button
-              onClick={() => setSelectedCategories(new Set())}
-              className="px-4 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+              onClick={clearFilters}
+              className={`rounded-lg bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-500/20 dark:text-blue-400 ${focusRing}`}
             >
               Clear all filters
             </button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
-          {sortedAndFilteredPackages.map((pkg) => (
-            <div
-              key={pkg.id}
-              className={`p-6 transition-all duration-200 cursor-pointer relative rounded-xl backdrop-blur-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
-                ${
-                  selectedPackages.has(pkg.id)
-                    ? "border border-blue-500 dark:border-blue-400 ring-2 ring-blue-500/70 dark:ring-blue-400/70 transform scale-[1.02] shadow-md bg-white/80 dark:bg-neutral-900/80"
-                    : "macos-card macos-blur border border-neutral-200/40 dark:border-neutral-700/40 shadow-sm hover:shadow-md hover:scale-[1.01]"
+        <div className="grid grid-cols-1 gap-4 pb-12 sm:grid-cols-2 lg:grid-cols-3">
+          {visiblePackages.map(({ pkg, rank }) => {
+            const selected = selectedPackages.has(pkg.id);
+            return (
+              <div
+                key={pkg.id}
+                className={`surface surface-interactive relative cursor-pointer rounded-2xl p-5 ${focusRing} ${
+                  selected
+                    ? "!border-blue-500 ring-2 ring-blue-500/60 dark:!border-blue-400 dark:ring-blue-400/60"
+                    : ""
                 }`}
-              onClick={() => togglePackage(pkg.id)}
-              tabIndex={0}
-              role="button"
-              aria-pressed={selectedPackages.has(pkg.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  togglePackage(pkg.id);
-                }
-              }}
-            >
-              {selectedPackages.has(pkg.id) && (
-                <div className="absolute top-3 right-3 h-5 w-5 flex items-center justify-center rounded-full bg-blue-500 dark:bg-blue-400">
-                  <CheckIcon className="h-3 w-3 text-white" />
-                </div>
-              )}
-              <div className="flex items-center gap-3 mb-3">
-                {pkg.iconUrl && (
-                  <img
-                    src={pkg.iconUrl}
-                    alt={`${pkg.name} icon`}
-                    className="w-10 h-10 rounded-md object-contain shadow-sm"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => (e.currentTarget.style.display = "none")}
-                  />
-                )}
-                <h3 className="text-lg font-medium">{pkg.name}</h3>
-              </div>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-3 line-clamp-2">
-                {pkg.description || "No description available"}
-              </p>
-              {pkg.installCount !== undefined && (
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  {pkg.installCount.toLocaleString()} installations in the last
-                  year
-                </p>
-              )}
-              <div className="mt-3 flex justify-between items-center">
-                <span className="inline-block px-2.5 py-1 text-xs font-medium rounded-full bg-neutral-100/80 dark:bg-neutral-700/80 text-neutral-600 dark:text-neutral-300 shadow-sm">
-                  {pkg.category}
+                onClick={() => togglePackage(pkg.id)}
+                tabIndex={0}
+                role="button"
+                aria-pressed={selected}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    togglePackage(pkg.id);
+                  }
+                }}
+              >
+                <span
+                  className={`absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full border transition-colors ${
+                    selected
+                      ? "border-blue-500 bg-blue-500 dark:border-blue-400 dark:bg-blue-400"
+                      : "border-neutral-300 dark:border-neutral-600"
+                  }`}
+                  aria-hidden
+                >
+                  {selected && <CheckIcon className="h-3.5 w-3.5 text-white" />}
                 </span>
-                {pkg.growthPercentage !== undefined && (
-                  <span
-                    className={`text-xs font-medium flex items-center ${
-                      pkg.growthPercentage >= 0
-                        ? "text-green-600 dark:text-green-400"
-                        : "text-red-600 dark:text-red-400"
-                    }`}
-                  >
-                    {pkg.growthPercentage >= 0 ? "+" : ""}
-                    {pkg.growthPercentage.toFixed(1)}%
-                    {pkg.growthPercentage >= 0 ? (
-                      <TrendingUpIcon className="h-4 w-4 ml-1" />
-                    ) : (
-                      <TrendingDownIcon className="h-4 w-4 ml-1" />
-                    )}
-                  </span>
-                )}
+
+                <div className="mb-3 flex items-center gap-3 pr-8">
+                  {pkg.iconUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={pkg.iconUrl}
+                      alt=""
+                      className="h-11 w-11 shrink-0 rounded-xl object-contain shadow-sm"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => (e.currentTarget.style.display = "none")}
+                    />
+                  ) : null}
+                  <div className="min-w-0">
+                    <h3 className="truncate text-base font-semibold leading-tight">
+                      {pkg.name}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
+                      #{rank} · {pkg.category}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="mb-4 line-clamp-2 min-h-10 text-sm text-neutral-600 dark:text-neutral-300">
+                  {pkg.description || "No description available"}
+                </p>
+
+                <div className="flex items-center justify-between border-t border-neutral-500/10 pt-3 text-xs">
+                  {pkg.installCount !== undefined ? (
+                    <span
+                      className="text-neutral-500 dark:text-neutral-400"
+                      title={`${pkg.installCount.toLocaleString()} installations in the last year`}
+                    >
+                      <span className="font-semibold tabular-nums text-neutral-800 dark:text-neutral-100">
+                        {compact.format(pkg.installCount)}
+                      </span>{" "}
+                      installs / year
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+                  {pkg.growthPercentage !== undefined && (
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium tabular-nums ${
+                        pkg.growthPercentage >= 0
+                          ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                          : "bg-red-500/10 text-red-600 dark:text-red-400"
+                      }`}
+                    >
+                      {pkg.growthPercentage >= 0 ? (
+                        <TrendingUpIcon className="h-3.5 w-3.5" />
+                      ) : (
+                        <TrendingDownIcon className="h-3.5 w-3.5" />
+                      )}
+                      {pkg.growthPercentage >= 0 ? "+" : ""}
+                      {pkg.growthPercentage.toFixed(1)}%
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </>
