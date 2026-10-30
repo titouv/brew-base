@@ -25,9 +25,6 @@ export default function PackageList({ initialPackages }: PackageListProps) {
   const [sortBy, setSortBy] = useState<"installs" | "growth">("installs");
   const [showCopyOptions, setShowCopyOptions] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(
-    initialPackages.length === 0
-  );
 
   const togglePackage = (packageId: string) => {
     const newSelected = new Set(selectedPackages);
@@ -90,9 +87,9 @@ export default function PackageList({ initialPackages }: PackageListProps) {
 
   return (
     <>
-      <div className="sticky top-4 z-20 mb-8 p-4 macos-card macos-blur flex justify-between items-center relative group rounded-xl shadow-sm border border-neutral-200/40 dark:border-neutral-700/40 backdrop-blur-xl">
+      <div className="sticky top-4 z-20 mb-8 p-4 macos-card macos-blur flex justify-between items-center gap-3 group rounded-xl shadow-sm border border-neutral-200/40 dark:border-neutral-700/40 backdrop-blur-xl">
         <code
-          className={`text-sm font-mono ${
+          className={`text-sm font-mono min-w-0 overflow-x-auto whitespace-nowrap ${
             selectedPackages.size === 0
               ? "text-neutral-400 dark:text-neutral-600"
               : "text-neutral-700 dark:text-neutral-300"
@@ -105,15 +102,23 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             Select packages to generate a valid command
           </div>
         )}
-        <div className="relative">
+        <div
+          className="relative shrink-0"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setShowCopyOptions(false);
+          }}
+        >
           <button
             onClick={() => setShowCopyOptions(!showCopyOptions)}
             className={`p-2 rounded-md transition-all duration-150 ${
               copiedCommand
                 ? "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
                 : "hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400 active:bg-neutral-200 dark:active:bg-neutral-700"
-            } flex items-center gap-1`}
+            } flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 disabled:opacity-40 disabled:cursor-not-allowed`}
             title="Copy options"
+            aria-label="Copy options"
+            aria-haspopup="menu"
+            aria-expanded={showCopyOptions}
             disabled={selectedPackages.size === 0}
           >
             {copiedCommand ? (
@@ -129,13 +134,17 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             )}
           </button>
           {showCopyOptions && (
-            <div className="absolute right-0 top-full mt-2 w-72 macos-card macos-blur z-10 overflow-hidden animate-fadeIn rounded-lg shadow-lg border border-neutral-200/60 dark:border-neutral-700/60 backdrop-blur-xl bg-neutral-800!">
+            <div
+              role="menu"
+              className="absolute right-0 top-full mt-2 w-72 z-10 overflow-hidden animate-fadeIn rounded-lg shadow-lg border border-neutral-200/60 dark:border-neutral-700/60 backdrop-blur-xl bg-white/95 dark:bg-neutral-800/95 text-neutral-800 dark:text-neutral-100"
+            >
               <div className="py-1">
                 <button
+                  role="menuitem"
                   onClick={() =>
                     copyToClipboard(getBrewCommand(false), "standard")
                   }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 flex items-center gap-2 transition-colors"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 focus-visible:outline-none focus-visible:bg-neutral-100/80 dark:focus-visible:bg-neutral-700/80 flex items-center gap-2 transition-colors"
                 >
                   <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                   <span>
@@ -147,10 +156,11 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                   </span>
                 </button>
                 <button
+                  role="menuitem"
                   onClick={() =>
                     copyToClipboard(getBrewCommand(true), "withInstall")
                   }
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 flex items-center gap-2 transition-colors"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 focus-visible:outline-none focus-visible:bg-neutral-100/80 dark:focus-visible:bg-neutral-700/80 flex items-center gap-2 transition-colors"
                 >
                   <Copy className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
                   <span>Copy with Homebrew installation</span>
@@ -169,7 +179,8 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 <button
                   key={category}
                   onClick={() => toggleCategory(category)}
-                  className={`px-4 py-1.5 text-sm font-medium transition-all rounded-full 
+                  aria-pressed={selectedCategories.has(category)}
+                  className={`px-4 py-1.5 text-sm font-medium transition-all rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60
                     ${
                       selectedCategories.has(category)
                         ? "bg-blue-500/90 text-white shadow-sm"
@@ -181,10 +192,15 @@ export default function PackageList({ initialPackages }: PackageListProps) {
               ))}
             </div>
 
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+              Showing {sortedAndFilteredPackages.length}{" "}
+              {sortedAndFilteredPackages.length === 1 ? "package" : "packages"}
+            </p>
+
             {selectedCategories.size > 0 && (
               <button
                 onClick={() => setSelectedCategories(new Set())}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-flex items-center"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
               >
                 Clear filters
               </button>
@@ -193,10 +209,18 @@ export default function PackageList({ initialPackages }: PackageListProps) {
 
           <div className="flex items-center">
             {selectedPackages.size > 0 && (
-              <div className="mr-4 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full whitespace-nowrap shadow-sm border border-blue-100 dark:border-blue-800/50">
-                {selectedPackages.size}{" "}
-                {selectedPackages.size === 1 ? "package" : "packages"} selected
-              </div>
+              <>
+                <div className="mr-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full whitespace-nowrap shadow-sm border border-blue-100 dark:border-blue-800/50">
+                  {selectedPackages.size}{" "}
+                  {selectedPackages.size === 1 ? "package" : "packages"} selected
+                </div>
+                <button
+                  onClick={() => setSelectedPackages(new Set())}
+                  className="mr-4 text-xs text-blue-600 dark:text-blue-400 hover:underline whitespace-nowrap rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
+                >
+                  Clear selection
+                </button>
+              </>
             )}
             <div className="flex items-center gap-2">
               <label
@@ -221,28 +245,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
-          {[...Array(9)].map((_, index) => (
-            <div
-              key={index}
-              className="p-6 macos-card macos-blur animate-pulse rounded-xl shadow-sm border border-neutral-200/40 dark:border-neutral-700/40"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-md bg-neutral-200/70 dark:bg-neutral-800/70"></div>
-                <div className="h-5 bg-neutral-200/70 dark:bg-neutral-800/70 rounded w-1/2"></div>
-              </div>
-              <div className="h-4 bg-neutral-200/70 dark:bg-neutral-800/70 rounded mb-2 w-3/4"></div>
-              <div className="h-4 bg-neutral-200/70 dark:bg-neutral-800/70 rounded mb-3 w-full"></div>
-              <div className="h-3 bg-neutral-200/70 dark:bg-neutral-800/70 rounded mb-3 w-1/3"></div>
-              <div className="flex justify-between items-center">
-                <div className="h-5 bg-neutral-200/70 dark:bg-neutral-800/70 rounded-full w-1/4"></div>
-                <div className="h-4 bg-neutral-200/70 dark:bg-neutral-800/70 rounded w-1/6"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : sortedAndFilteredPackages.length === 0 ? (
+      {sortedAndFilteredPackages.length === 0 ? (
         <div className="py-16 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4 shadow-sm">
             <XIcon className="w-8 h-8 text-neutral-500 dark:text-neutral-400" />
@@ -265,10 +268,10 @@ export default function PackageList({ initialPackages }: PackageListProps) {
           {sortedAndFilteredPackages.map((pkg) => (
             <div
               key={pkg.id}
-              className={`p-6 transition-all duration-200 cursor-pointer relative rounded-xl backdrop-blur-lg
+              className={`p-6 transition-all duration-200 cursor-pointer relative rounded-xl backdrop-blur-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent
                 ${
                   selectedPackages.has(pkg.id)
-                    ? "border-2 border-blue-500 dark:border-blue-400 transform scale-[1.02] shadow-md bg-white/80 dark:bg-neutral-900/80"
+                    ? "border border-blue-500 dark:border-blue-400 ring-2 ring-blue-500/70 dark:ring-blue-400/70 transform scale-[1.02] shadow-md bg-white/80 dark:bg-neutral-900/80"
                     : "macos-card macos-blur border border-neutral-200/40 dark:border-neutral-700/40 shadow-sm hover:shadow-md hover:scale-[1.01]"
                 }`}
               onClick={() => togglePackage(pkg.id)}
@@ -293,6 +296,8 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                     src={pkg.iconUrl}
                     alt={`${pkg.name} icon`}
                     className="w-10 h-10 rounded-md object-contain shadow-sm"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => (e.currentTarget.style.display = "none")}
                   />
                 )}
@@ -301,7 +306,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
               <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-3 line-clamp-2">
                 {pkg.description || "No description available"}
               </p>
-              {pkg.installCount && (
+              {pkg.installCount !== undefined && (
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
                   {pkg.installCount.toLocaleString()} installations in the last
                   year

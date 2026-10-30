@@ -6,7 +6,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen p-4 sm:p-8 max-w-7xl mx-auto">
-      <header className="text-center mb-12 macos-card macos-blur pt-12 pb-14 rounded-xl border border-neutral-200/40 dark:border-neutral-700/40 shadow-sm">
+      <header className="text-center mb-12 macos-blur bg-white/60 dark:bg-neutral-900/50 px-4 pt-12 pb-14 rounded-xl border border-neutral-200/40 dark:border-neutral-700/40 shadow-sm">
         <h1 className="text-4xl sm:text-5xl mb-5 font-bold tracking-tight">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-100 dark:to-neutral-300">
             Brew
@@ -23,7 +23,7 @@ export default async function Home() {
             href="https://brew.sh"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors shadow-sm backdrop-blur-sm inline-flex items-center gap-2"
+            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors shadow-sm backdrop-blur-sm inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900"
           >
             <svg
               className="w-5 h-5"
@@ -59,6 +59,10 @@ export default async function Home() {
       </header>
 
       <PackageList initialPackages={packages} />
+
+      <footer className="text-center text-xs text-neutral-500 dark:text-neutral-400 pb-8">
+        Install counts come from Homebrew&apos;s 365-day cask analytics.
+      </footer>
     </div>
   );
 }
