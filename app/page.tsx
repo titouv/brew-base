@@ -26,7 +26,7 @@ export default async function Home() {
     <div className="min-h-screen px-4 py-6 sm:px-8 max-w-7xl mx-auto">
       <nav className="flex items-center justify-between mb-10 sm:mb-14">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-sm">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
             <Beer className="h-5 w-5" aria-hidden />
           </span>
           <span className="font-pixel text-lg font-medium tracking-tight">
@@ -48,7 +48,7 @@ export default async function Home() {
         <h1 className="font-serif text-4xl sm:text-6xl font-normal tracking-tight leading-[1.05]">
           Pick your Mac apps.
           <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-500 dark:from-blue-400 dark:to-violet-400">
+          <span className="text-blue-600 dark:text-blue-400">
             Copy one command.
           </span>
         </h1>

@@ -114,11 +114,7 @@
 }
 
 body {
-  background:
-    radial-gradient(60rem 30rem at 15% -10%, rgba(0, 122, 255, 0.12), transparent 60%),
-    radial-gradient(50rem 28rem at 95% 0%, rgba(175, 82, 222, 0.08), transparent 60%),
-    var(--background);
-  background-attachment: fixed;
+  background-color: var(--background);
   color: var(--foreground);
 }
 
