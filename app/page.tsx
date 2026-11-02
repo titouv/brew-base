@@ -78,7 +78,7 @@ export default async function Home() {
       </header>
 
       <main id="main" className="mx-auto max-w-6xl px-4 sm:px-6">
-        <section className="grid gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
+        <section className="grid gap-8 pb-12 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brew-faint">
               Independent Homebrew cask browser
@@ -119,33 +119,29 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-brew-border bg-brew-surface">
-            <dl className="grid grid-cols-2">
-              <div className="col-span-2 border-b border-brew-border p-6">
-                <dt className="text-sm text-brew-muted">Casks indexed</dt>
-                <dd className="mt-2 text-5xl font-extrabold tracking-tight tabular-nums text-brew-strong">
-                  {stats.casks}
-                </dd>
-                <dd className="mt-2 text-xs text-brew-faint">
-                  Top casks from Homebrew&apos;s 365-day analytics
-                </dd>
-              </div>
-
-              <div className="border-r border-brew-border p-5">
-                <dt className="text-xs text-brew-muted">Categories</dt>
-                <dd className="mt-1 text-2xl font-bold tabular-nums text-brew-strong">
-                  {stats.categories}
-                </dd>
-              </div>
-
-              <div className="p-5">
-                <dt className="text-xs text-brew-muted">Installs / year</dt>
-                <dd className="mt-1 text-2xl font-bold tabular-nums text-brew-strong">
-                  {stats.installs}
-                </dd>
-              </div>
-            </dl>
-          </div>
+          <dl
+            aria-label="Catalogue statistics"
+            className="grid grid-cols-3 gap-5 border-t border-brew-border pt-5 lg:self-end lg:border-l lg:border-t-0 lg:pb-1 lg:pl-8 lg:pt-0"
+          >
+            <div>
+              <dt className="text-xs text-brew-muted">Casks</dt>
+              <dd className="mt-1 text-2xl font-bold tabular-nums text-brew-strong">
+                {stats.casks}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-brew-muted">Categories</dt>
+              <dd className="mt-1 text-2xl font-bold tabular-nums text-brew-strong">
+                {stats.categories}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-brew-muted">Installs / year</dt>
+              <dd className="mt-1 text-2xl font-bold tabular-nums text-brew-strong">
+                {stats.installs}
+              </dd>
+            </div>
+          </dl>
         </section>
 
         <section
