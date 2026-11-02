@@ -1,121 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --accent: #007aff;
-  --accent-dark: #0062cc;
-  
-  /* macOS UI Variables */
-  --card-bg: rgba(250, 250, 250, 0.8);
-  --card-border: rgba(0, 0, 0, 0.06);
-  --card-hover: rgba(255, 255, 255, 0.95);
-  --card-shadow: rgba(0, 0, 0, 0.05);
-  --menu-bg: rgba(255, 255, 255, 0.9);
-  --button-bg: rgba(239, 239, 239, 0.9);
-  --button-hover: rgba(229, 229, 229, 0.9);
-  --button-active: rgba(219, 219, 219, 0.9);
-  --sidebar-bg: rgba(242, 242, 247, 0.6);
-  --backdrop-blur: 20px;
-  color-scheme: light dark;
+/*
+ * BrewBase follows the Homebrew website design language (brew.sh):
+ * a warm brown shell, amber reading text, cream highlights, hairline
+ * brown borders, 0.4em radii and system sans/mono type.
+ * https://brew.sh
+ */
+@theme {
+  --color-brew-bg: #2e2a24;
+  --color-brew-surface: rgba(255, 255, 255, 0.06);
+  --color-brew-surface-hover: rgba(255, 255, 255, 0.1);
+  --color-brew-code: rgba(0, 0, 0, 0.3);
+  --color-brew-border: rgba(162, 107, 20, 0.3);
+  --color-brew-border-strong: rgba(162, 107, 20, 0.6);
+  --color-brew-text: #ffd79a;
+  --color-brew-strong: #ffffff;
+  --color-brew-soft: #cbbda8;
+  --color-brew-link: #e2a843;
+  --color-brew-link-hover: #f7c96c;
+  --color-brew-focus: #87c7d8;
+  --color-brew-selection: #745626;
+  --color-brew-amber: #fbb040;
+  --color-brew-green: #a8d8a8;
+  --color-brew-red: #ee918f;
+
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Monaco, Menlo, Consolas, monospace;
+
+  --radius-brew: 0.4em;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-geist-serif), ui-serif, Georgia, serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", SFMono-Regular,
-    Menlo, Monaco, Consolas, monospace;
-  --font-pixel: var(--font-geist-pixel-square), var(--font-geist-mono),
-    ui-monospace, monospace;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@layer utilities {
-  .animate-fadeIn {
-    animation: fadeIn 0.2s ease-out forwards;
-  }
-  
-  /* macOS-style utilities */
-  .macos-blur {
-    backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
-    -webkit-backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
-  }
-  
-  /* Translucent panel shared by the hero, command bar and package cards */
-  .surface {
-    background-color: var(--card-bg);
-    border: 1px solid var(--card-border);
-    box-shadow: 0 1px 2px var(--card-shadow);
-    backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
-    -webkit-backdrop-filter: saturate(180%) blur(var(--backdrop-blur));
+@layer base {
+  html {
+    color-scheme: dark;
   }
 
-  .surface-interactive {
-    transition: background-color 0.2s ease, border-color 0.2s ease,
-      box-shadow 0.2s ease, transform 0.2s ease;
+  body {
+    background-color: var(--color-brew-bg);
+    color: var(--color-brew-text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.48;
   }
 
-  .surface-interactive:hover {
-    background-color: var(--card-hover);
-    box-shadow: 0 6px 20px var(--card-shadow);
-    transform: translateY(-2px);
+  ::selection {
+    background-color: var(--color-brew-selection);
+    color: var(--color-brew-strong);
   }
-  
-  .macos-button {
-    background-color: var(--button-bg);
-    color: var(--foreground);
-    font-weight: 500;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--card-border);
-    transition: all 0.15s ease;
-  }
-  
-  .macos-button:hover {
-    background-color: var(--button-hover);
-  }
-  
-  .macos-button:active {
-    background-color: var(--button-active);
-    transform: scale(0.98);
-  }
-  
-  .macos-button-primary {
-    background-color: var(--accent);
-    color: white;
-    border: none;
-  }
-  
-  .macos-button-primary:hover {
-    background-color: var(--accent-dark);
-  }
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1e1e1e;
-    --foreground: #e0e0e0;
-    --card-bg: rgba(40, 40, 40, 0.8);
-    --card-border: rgba(255, 255, 255, 0.08);
-    --card-hover: rgba(50, 50, 50, 0.9);
-    --card-shadow: rgba(0, 0, 0, 0.2);
-    --menu-bg: rgba(40, 40, 40, 0.95);
-    --button-bg: rgba(60, 60, 60, 0.8);
-    --button-hover: rgba(70, 70, 70, 0.8);
-    --button-active: rgba(50, 50, 50, 0.8);
-    --sidebar-bg: rgba(40, 40, 40, 0.8);
+  :focus-visible {
+    outline: 3px solid var(--color-brew-focus);
+    outline-offset: 3px;
   }
-}
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
+  a {
+    color: var(--color-brew-link);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-brew-link-hover);
+    text-decoration: underline;
+  }
+
+  code,
+  pre {
+    font-family: var(--font-mono);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

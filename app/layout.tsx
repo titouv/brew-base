@@ -1,21 +1,16 @@
-import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistSerif } from "geist/font/serif/variable";
-import { GeistMono } from "geist/font/mono";
-import { GeistPixelSquare } from "geist/font/pixel/square";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const fontVariables = [
-  GeistSans.variable,
-  GeistSerif.variable,
-  GeistMono.variable,
-  GeistPixelSquare.variable,
-].join(" ");
-
 export const metadata: Metadata = {
-  title: "BrewBase",
+  title: "BrewBase: pick Homebrew casks, copy one command",
   description:
-    "Discover and install Homebrew packages effortlessly with BrewBase.",
+    "Browse the most installed Homebrew casks, pick the apps you need and copy a single brew install command.",
+  applicationName: "BrewBase",
+};
+
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#2e2a24",
 };
 
 export default function RootLayout({
@@ -24,11 +19,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={fontVariables} suppressHydrationWarning>
-      <body
-        className={`antialiased font-sans overflow-y-scroll`}
-        suppressHydrationWarning
-      >
+    <html lang="en">
+      <body className="min-h-screen antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-brew focus:bg-brew-code focus:px-4 focus:py-2 focus:text-brew-text"
+        >
+          Skip to content
+        </a>
         {children}
       </body>
     </html>

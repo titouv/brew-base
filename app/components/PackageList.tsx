@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BrewPackage } from "../data/packages";
 import {
   TrendingDownIcon,
@@ -9,7 +9,7 @@ import {
   ChevronDown,
   CheckIcon,
   SearchIcon,
-  XIcon,
+  SearchXIcon,
 } from "lucide-react";
 
 interface PackageListProps {
@@ -28,16 +28,13 @@ const compact = new Intl.NumberFormat("en", {
   maximumFractionDigits: 1,
 });
 
-const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60";
-
 function PackageIcon({ name, iconUrl }: { name: string; iconUrl?: string }) {
   const [failed, setFailed] = useState(false);
 
   if (!iconUrl || failed) {
     return (
       <span
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-neutral-500/15 text-lg font-semibold text-neutral-500 dark:text-neutral-400"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-brew border border-brew-border bg-brew-surface text-lg font-bold text-brew-text"
         aria-hidden
       >
         {name.charAt(0).toUpperCase()}
@@ -47,12 +44,12 @@ function PackageIcon({ name, iconUrl }: { name: string; iconUrl?: string }) {
 
   // The padded tile gives full-bleed and transparent icons the same breathing room.
   return (
-    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-brew border border-brew-border bg-white p-1.5">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={iconUrl}
         alt=""
-        className="h-full w-full rounded-md object-contain"
+        className="h-full w-full rounded-[0.2em] object-contain"
         loading="lazy"
         decoding="async"
         referrerPolicy="no-referrer"
@@ -73,6 +70,33 @@ export default function PackageList({ initialPackages }: PackageListProps) {
   const [query, setQuery] = useState("");
   const [showCopyOptions, setShowCopyOptions] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+  const copyMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!copiedCommand) return;
+    const timeout = setTimeout(() => setCopiedCommand(null), 2000);
+    return () => clearTimeout(timeout);
+  }, [copiedCommand]);
+
+  useEffect(() => {
+    if (!showCopyOptions) return;
+
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (!copyMenuRef.current?.contains(event.target as Node)) {
+        setShowCopyOptions(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowCopyOptions(false);
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePress);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePress);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [showCopyOptions]);
 
   const togglePackage = (packageId: string) => {
     const newSelected = new Set(selectedPackages);
@@ -85,9 +109,10 @@ export default function PackageList({ initialPackages }: PackageListProps) {
   };
 
   const copyToClipboard = (text: string, type: string) => {
-    navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text).catch(() => {
+      // Clipboard access can be denied by the browser; keep the UI responsive.
+    });
     setCopiedCommand(type);
-    setTimeout(() => setCopiedCommand(null), 2000);
     setShowCopyOptions(false);
   };
 
@@ -149,48 +174,49 @@ export default function PackageList({ initialPackages }: PackageListProps) {
 
   return (
     <>
-      <div className="sticky top-4 z-20 mb-8 rounded-2xl bg-neutral-900/95 text-neutral-100 shadow-lg ring-1 ring-white/10 backdrop-blur-xl">
-        <div className="flex items-center gap-3 p-3 pl-5">
-          <span
-            className="select-none font-mono text-sm text-emerald-400"
-            aria-hidden
-          >
-            $
-          </span>
-          <code
-            className={`min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-sm font-mono ${
-              selectedPackages.size === 0
-                ? "text-neutral-500"
-                : "text-neutral-100"
-            }`}
-          >
-            {getBrewCommand()}
+      <div className="sticky top-3 z-20 mb-8 bg-brew-bg">
+        <div className="flex items-stretch rounded-brew border border-brew-border bg-brew-code">
+          <code className="flex min-h-11 min-w-0 flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap rounded-l-brew px-4 py-3 font-mono text-sm">
+            <span className="select-none text-brew-green" aria-hidden>
+              $
+            </span>
+            <span
+              className={
+                selectedPackages.size === 0
+                  ? "text-brew-soft"
+                  : "text-brew-strong"
+              }
+            >
+              {getBrewCommand()}
+            </span>
             {selectedPackages.size === 0 && (
-              <span className="ml-2 font-sans text-xs text-neutral-500">
-                ← select apps below
+              <span className="font-sans text-xs text-brew-soft">
+                Select casks below
               </span>
             )}
           </code>
+
           {selectedPackages.size > 0 && (
             <button
+              type="button"
               onClick={() => setSelectedPackages(new Set())}
-              className={`hidden shrink-0 rounded-lg px-2.5 py-1.5 text-xs text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100 sm:block ${focusRing}`}
+              className="min-h-11 shrink-0 border-l border-brew-border px-3 text-xs font-bold text-brew-link transition-colors hover:bg-brew-selection hover:text-brew-link-hover"
             >
-              Clear {selectedPackages.size}
+              <span className="sm:hidden">Clear</span>
+              <span className="hidden sm:inline">
+                Clear {selectedPackages.size}
+              </span>
             </button>
           )}
-          <div
-            className="relative shrink-0"
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setShowCopyOptions(false);
-            }}
-          >
+
+          <div ref={copyMenuRef} className="relative flex shrink-0">
             <button
+              type="button"
               onClick={() => setShowCopyOptions(!showCopyOptions)}
-              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${focusRing} ${
+              className={`flex min-h-11 items-center gap-2 rounded-r-brew border-l border-brew-border px-4 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                 copiedCommand
-                  ? "bg-emerald-500/20 text-emerald-300"
-                  : "bg-blue-600 text-white enabled:hover:bg-blue-500 enabled:active:bg-blue-700"
+                  ? "bg-brew-selection text-brew-strong"
+                  : "bg-brew-code text-brew-text enabled:hover:bg-brew-selection enabled:hover:text-brew-strong"
               }`}
               title="Copy options"
               aria-label="Copy options"
@@ -200,87 +226,96 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             >
               {copiedCommand ? (
                 <>
-                  <CheckIcon className="h-4 w-4" />
-                  Copied!
+                  <CheckIcon className="h-4 w-4" aria-hidden />
+                  Copied
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4" />
+                  <Copy className="h-4 w-4" aria-hidden />
                   Copy
-                  <ChevronDown className="h-4 w-4 opacity-70" />
+                  <ChevronDown className="h-4 w-4" aria-hidden />
                 </>
               )}
             </button>
+
             {showCopyOptions && (
               <div
                 role="menu"
-                className="animate-fadeIn absolute right-0 top-full z-10 mt-2 w-72 overflow-hidden rounded-xl border border-neutral-200/60 bg-white/95 text-neutral-800 shadow-xl backdrop-blur-xl dark:border-neutral-700/60 dark:bg-neutral-800/95 dark:text-neutral-100"
+                aria-label="Copy options"
+                className="absolute right-0 top-full z-30 mt-2 w-72 overflow-hidden rounded-brew border border-brew-border bg-brew-bg shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
               >
-                <div className="py-1">
-                  <button
-                    role="menuitem"
-                    onClick={() =>
-                      copyToClipboard(getBrewCommand(false), "standard")
-                    }
-                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-neutral-100/80 focus-visible:bg-neutral-100/80 focus-visible:outline-none dark:hover:bg-neutral-700/80 dark:focus-visible:bg-neutral-700/80"
-                  >
-                    <Copy className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-                    <span>
-                      Copy{" "}
-                      <span className="text-neutral-500 dark:text-neutral-400">
-                        brew install
-                      </span>{" "}
-                      command
-                    </span>
-                  </button>
-                  <button
-                    role="menuitem"
-                    onClick={() =>
-                      copyToClipboard(getBrewCommand(true), "withInstall")
-                    }
-                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-neutral-100/80 focus-visible:bg-neutral-100/80 focus-visible:outline-none dark:hover:bg-neutral-700/80 dark:focus-visible:bg-neutral-700/80"
-                  >
-                    <Copy className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-                    <span>Copy with Homebrew installation</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() =>
+                    copyToClipboard(getBrewCommand(false), "standard")
+                  }
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm text-brew-text transition-colors hover:bg-brew-selection hover:text-brew-strong"
+                >
+                  <Copy
+                    className="mt-0.5 h-4 w-4 shrink-0 text-brew-soft"
+                    aria-hidden
+                  />
+                  <span>
+                    Copy <code className="text-brew-soft">brew install</code>{" "}
+                    command
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() =>
+                    copyToClipboard(getBrewCommand(true), "withInstall")
+                  }
+                  className="flex w-full items-start gap-3 border-t border-brew-border px-4 py-3 text-left text-sm text-brew-text transition-colors hover:bg-brew-selection hover:text-brew-strong"
+                >
+                  <Copy
+                    className="mt-0.5 h-4 w-4 shrink-0 text-brew-soft"
+                    aria-hidden
+                  />
+                  <span>Copy with Homebrew installation</span>
+                </button>
               </div>
             )}
           </div>
         </div>
+        <span className="sr-only" role="status">
+          {copiedCommand ? "Command copied to clipboard" : ""}
+        </span>
       </div>
 
       <div className="mb-6 space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <SearchIcon
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brew-soft"
               aria-hidden
             />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search apps…"
-              aria-label="Search apps"
-              className={`surface w-full rounded-xl py-2.5 pl-10 pr-4 text-sm placeholder:text-neutral-400 ${focusRing}`}
+              placeholder="Search casks…"
+              aria-label="Search casks"
+              className="min-h-11 w-full rounded-brew border border-brew-border bg-brew-surface py-2.5 pl-10 pr-4 text-sm text-brew-strong placeholder:text-brew-soft/70"
             />
           </div>
 
           <div
             role="group"
             aria-label="Sort by"
-            className="surface inline-flex shrink-0 rounded-xl p-1"
+            className="inline-flex shrink-0 self-start rounded-brew border border-brew-border bg-brew-surface p-1 sm:self-auto"
           >
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option.value}
+                type="button"
                 onClick={() => setSortBy(option.value)}
                 aria-pressed={sortBy === option.value}
-                className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${focusRing} ${
+                className={`min-h-11 rounded-[0.25em] px-3.5 py-1.5 text-sm transition-colors ${
                   sortBy === option.value
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                    ? "bg-brew-text font-bold text-brew-bg"
+                    : "font-semibold text-brew-text hover:bg-brew-surface-hover"
                 }`}
               >
                 {option.label}
@@ -295,58 +330,55 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             return (
               <button
                 key={name}
+                type="button"
                 onClick={() => toggleCategory(name)}
                 aria-pressed={active}
-                className={`inline-flex items-center gap-1.5 rounded-full py-1.5 pl-3.5 pr-3 text-sm font-medium transition-colors ${focusRing} ${
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-brew border px-3 py-1.5 text-sm transition-colors ${
                   active
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-neutral-500/10 text-neutral-700 hover:bg-neutral-500/20 dark:text-neutral-300"
+                    ? "border-brew-text bg-brew-text font-bold text-brew-bg"
+                    : "border-brew-border bg-brew-surface font-semibold text-brew-text hover:bg-brew-surface-hover"
                 }`}
               >
                 {name}
-                <span
-                  className={`text-xs tabular-nums ${
-                    active ? "text-white/70" : "text-neutral-400"
-                  }`}
-                >
-                  {count}
-                </span>
+                <span className="text-xs tabular-nums opacity-70">{count}</span>
               </button>
             );
           })}
           {hasFilters && (
             <button
+              type="button"
               onClick={clearFilters}
-              className={`ml-1 rounded px-1 text-sm text-blue-600 hover:underline dark:text-blue-400 ${focusRing}`}
+              className="ml-1 min-h-11 px-1 text-sm font-bold text-brew-link transition-colors hover:text-brew-link-hover hover:underline"
             >
               Clear filters
             </button>
           )}
         </div>
 
-        <p
-          className="text-xs text-neutral-500 dark:text-neutral-400"
-          aria-live="polite"
-        >
+        <p className="text-sm text-brew-soft" aria-live="polite">
           Showing {visiblePackages.length}{" "}
-          {visiblePackages.length === 1 ? "app" : "apps"}
+          {visiblePackages.length === 1 ? "cask" : "casks"}
           {selectedPackages.size > 0 && ` · ${selectedPackages.size} selected`}
         </p>
       </div>
 
       {visiblePackages.length === 0 ? (
         <div className="py-16 text-center">
-          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-neutral-500/10">
-            <XIcon className="h-8 w-8 text-neutral-500 dark:text-neutral-400" />
-          </div>
-          <h3 className="mb-2 text-lg font-medium">No apps found</h3>
-          <p className="mb-4 text-neutral-500 dark:text-neutral-400">
-            Try a different search or remove some filters.
+          <SearchXIcon
+            className="mx-auto mb-4 h-10 w-10 text-brew-soft"
+            aria-hidden
+          />
+          <h3 className="mb-2 text-xl font-bold text-brew-strong">
+            No casks found
+          </h3>
+          <p className="mb-5 text-brew-text">
+            Try a different search or remove a filter.
           </p>
           {hasFilters && (
             <button
+              type="button"
               onClick={clearFilters}
-              className={`rounded-lg bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-500/20 dark:text-blue-400 ${focusRing}`}
+              className="min-h-11 rounded-brew border border-brew-border bg-brew-surface px-4 py-2 text-sm font-bold text-brew-text transition-colors hover:bg-brew-surface-hover"
             >
               Clear all filters
             </button>
@@ -359,10 +391,10 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             return (
               <div
                 key={pkg.id}
-                className={`surface surface-interactive relative cursor-pointer rounded-2xl p-5 ${focusRing} ${
+                className={`relative flex cursor-pointer flex-col rounded-brew border p-5 transition-colors ${
                   selected
-                    ? "!border-blue-500 ring-2 ring-blue-500/60 dark:!border-blue-400 dark:ring-blue-400/60"
-                    : ""
+                    ? "border-brew-text bg-brew-surface-hover"
+                    : "border-brew-border bg-brew-surface hover:border-brew-border-strong hover:bg-brew-surface-hover"
                 }`}
                 onClick={() => togglePackage(pkg.id)}
                 tabIndex={0}
@@ -376,39 +408,39 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 }}
               >
                 <span
-                  className={`absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full border transition-colors ${
+                  className={`absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-[0.2em] border transition-colors ${
                     selected
-                      ? "border-blue-500 bg-blue-500 dark:border-blue-400 dark:bg-blue-400"
-                      : "border-neutral-300 dark:border-neutral-600"
+                      ? "border-brew-text bg-brew-text text-brew-bg"
+                      : "border-brew-soft/60"
                   }`}
                   aria-hidden
                 >
-                  {selected && <CheckIcon className="h-3.5 w-3.5 text-white" />}
+                  {selected && <CheckIcon className="h-3.5 w-3.5" />}
                 </span>
 
                 <div className="mb-3 flex items-center gap-3 pr-8">
                   <PackageIcon name={pkg.name} iconUrl={pkg.iconUrl} />
                   <div className="min-w-0">
-                    <h3 className="truncate text-base font-semibold leading-tight">
+                    <h3 className="truncate text-base font-bold leading-tight text-brew-strong">
                       {pkg.name}
                     </h3>
-                    <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
+                    <p className="mt-0.5 text-xs text-brew-soft">
                       #{rank} · {pkg.category}
                     </p>
                   </div>
                 </div>
 
-                <p className="mb-4 line-clamp-2 min-h-10 text-sm text-neutral-600 dark:text-neutral-300">
+                <p className="mb-4 line-clamp-2 min-h-10 text-sm text-brew-text">
                   {pkg.description || "No description available"}
                 </p>
 
-                <div className="flex items-center justify-between border-t border-neutral-500/10 pt-3 text-xs">
+                <div className="mt-auto flex items-center justify-between gap-3 border-t border-brew-border pt-3 text-xs">
                   {pkg.installCount !== undefined ? (
                     <span
-                      className="text-neutral-500 dark:text-neutral-400"
+                      className="text-brew-soft"
                       title={`${pkg.installCount.toLocaleString()} installations in the last year`}
                     >
-                      <span className="font-semibold tabular-nums text-neutral-800 dark:text-neutral-100">
+                      <span className="font-bold tabular-nums text-brew-strong">
                         {compact.format(pkg.installCount)}
                       </span>{" "}
                       installs / year
@@ -418,16 +450,17 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                   )}
                   {pkg.growthPercentage !== undefined && (
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium tabular-nums ${
+                      className={`inline-flex shrink-0 items-center gap-1 font-bold tabular-nums ${
                         pkg.growthPercentage >= 0
-                          ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                          : "bg-red-500/10 text-red-600 dark:text-red-400"
+                          ? "text-brew-green"
+                          : "text-brew-red"
                       }`}
+                      title="Change in daily installs compared with the previous year"
                     >
                       {pkg.growthPercentage >= 0 ? (
-                        <TrendingUpIcon className="h-3.5 w-3.5" />
+                        <TrendingUpIcon className="h-3.5 w-3.5" aria-hidden />
                       ) : (
-                        <TrendingDownIcon className="h-3.5 w-3.5" />
+                        <TrendingDownIcon className="h-3.5 w-3.5" aria-hidden />
                       )}
                       {pkg.growthPercentage >= 0 ? "+" : ""}
                       {pkg.growthPercentage.toFixed(1)}%
