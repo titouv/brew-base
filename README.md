@@ -18,7 +18,7 @@ in [DESIGN.md](./DESIGN.md):
 
 - Neutral espresso canvas with three warm surface steps and cream reading text
 - Cream actions and selected states, with amber reserved for the brand mark
-- System sans-serif for prose and a monospace stack for commands and identifiers
+- Instrument Serif for the hero and wordmark, system sans for UI and mono for code
 - Hairline neutral borders, a 6/8/12px radius scale, no gradients or shadows
 - Sticky top bar, full-bleed command bar, split hero and responsive cask grid
 - Visible keyboard focus, live copy feedback and reduced-motion support
@@ -33,6 +33,7 @@ The beer mark in the navigation is a generic icon, not the Homebrew logo. BrewBa
 - TypeScript
 - Tailwind CSS 4
 - [Lucide](https://lucide.dev) icons
+- [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif), bundled locally under the SIL Open Font License
 
 ## Development
 

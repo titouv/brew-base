@@ -1,10 +1,10 @@
-# BrewBase design guidelines 2.1
+# BrewBase design guidelines 2.2
 
 BrewBase is an independent Homebrew cask browser. These guidelines are a clean,
 modern interpretation of Homebrew's visual language, not a copy of the official
 Homebrew website guidelines. They define how BrewBase looks, moves and reads.
 
-- Version: 2.1
+- Version: 2.2
 - Updated: 2026-11-02
 - Reference: [brew.sh](https://brew.sh)
 - Status: independent project, not affiliated with or endorsed by Homebrew
@@ -23,6 +23,8 @@ Homebrew website guidelines. They define how BrewBase looks, moves and reads.
    the strongest elements on the page.
 6. **Accessible by default.** Keyboard access, visible focus, readable contrast
    and reduced motion are part of the design, not a later pass.
+7. **Editorial contrast.** A serif display against sans UI and mono code gives
+   the page a current, human tone without adding color or decoration.
 
 ## What stays from Homebrew
 
@@ -44,6 +46,7 @@ Homebrew website guidelines. They define how BrewBase looks, moves and reads.
 | Mostly static controls | Explicit hover, focus, pressed and selected states |
 | No motion language | 150–240ms transitions with a single easing curve |
 | Controls of mixed sizes | 44px primary targets and 36px compact targets |
+| All-sans type | Editorial serif display and wordmark over a system sans UI |
 
 Dark remains the signature theme. The warm brown canvas is the brand, so a
 light theme is intentionally out of scope.
@@ -98,18 +101,21 @@ Rules:
 
 ## Typography
 
-Use the platform stack. It renders natively on macOS and avoids a webfont
-request that would slow down the first install command.
+BrewBase pairs a locally bundled editorial serif with the platform sans and
+mono stacks. The serif carries display and brand moments; the UI stays sans.
 
 ```css
 --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
   Roboto, sans-serif;
+--font-serif: var(--font-instrument-serif), ui-serif, Georgia,
+  "Times New Roman", serif;
 --font-mono: ui-monospace, "SF Mono", Monaco, Menlo, Consolas, monospace;
 ```
 
 | Role | Size | Weight | Tracking | Notes |
 | --- | --- | --- | --- | --- |
-| Display | `clamp(2.6rem, 5.5vw, 4.4rem)` | 800 | `-0.035em` | One per page |
+| Display | `clamp(2.5rem, 7vw, 5rem)` | 400 serif | `-0.025em` | Hero only |
+| Wordmark | `1.25–1.5rem` | 400 serif | `-0.02em` | Header and footer |
 | Section title | `1.5rem` | 700 | `-0.02em` | Browse casks |
 | Card title | `0.95rem` | 600 | 0 | Single line, truncate |
 | Body | `1rem` | 400 | 0 | Line height `1.6` |
@@ -128,6 +134,12 @@ Rules:
 - Keep body copy at 16px or larger. Never shrink disclaimers below 12px.
 - Keep the display hierarchy monochrome. Emphasis comes from size and weight,
   not from a second accent color.
+- Use the serif only for the hero display and the wordmark. Never use it for
+  body copy, buttons, labels, card titles, data or code.
+- The second display line may be italic. Use at most one italic display line
+  per page.
+- Instrument Serif is bundled locally in `app/fonts` under the SIL Open Font
+  License. Do not replace it with a hosted webfont.
 
 ## Layout
 
@@ -172,7 +184,7 @@ Rules:
 ### Top bar
 
 - Sticky, 64px tall, translucent page color with a bottom hairline and blur.
-- Wordmark in cream, with the amber beer mark at 24px.
+- Wordmark in Instrument Serif and cream, with the amber beer mark at 24px.
 - Text links are muted by default and become cream on hover. The source action
   is a ghost 40px icon button.
 - Hide secondary links before wrapping the bar onto two lines.
@@ -256,8 +268,9 @@ Rules:
 
 - Define colors, fonts and easing in `@theme` in `app/globals.css`. Use the
   generated `brew-*` utilities in components.
-- Do not introduce a component library, a webfont, a gradient or a shadow
-  without updating these guidelines first.
+- The serif is bundled in `app/fonts` with its OFL license. Do not add another
+  webfont, a component library, a gradient or a shadow without updating these
+  guidelines first.
 - Keep one source of truth for tokens. A raw hex value in a component is a bug.
 - Re-check `bun run lint` and `bun run build` before shipping a design change.
 - Verify the page at 320px, 768px, 1024px and 1440px, with reduced motion and

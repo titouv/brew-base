@@ -38,7 +38,9 @@ export default async function Home() {
               strokeWidth={1.75}
               aria-hidden
             />
-            <span className="text-lg font-bold tracking-tight">BrewBase</span>
+            <span className="font-serif text-2xl font-normal tracking-tight">
+              BrewBase
+            </span>
           </Link>
 
           <nav aria-label="Primary" className="flex items-center gap-1">
@@ -84,10 +86,10 @@ export default async function Home() {
               Independent Homebrew cask browser
             </p>
 
-            <h1 className="mt-5 max-w-[13em] text-[clamp(2.6rem,5.5vw,4.4rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-brew-strong">
+            <h1 className="mt-5 max-w-[14em] font-serif text-[clamp(2.5rem,7vw,5rem)] font-normal leading-[0.98] tracking-[-0.025em] text-brew-strong">
               Pick your apps.
               <br />
-              Copy one command.
+              <span className="italic">Copy one command.</span>
             </h1>
 
             <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-brew-muted">
@@ -168,7 +170,7 @@ export default async function Home() {
       <footer className="mt-16 border-t border-brew-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
-            <p className="text-lg font-bold tracking-tight text-brew-strong">
+            <p className="font-serif text-xl font-normal tracking-tight text-brew-strong">
               BrewBase
             </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-brew-muted">

@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 /*
- * BrewBase design system 2.1
+ * BrewBase design system 2.2
  *
  * A clean, warm take on Homebrew's identity: neutral espresso surfaces,
- * cream type and one small amber brand mark. No gradients, glows or
- * decorative shadows. See DESIGN.md for the full guidelines.
+ * cream type, one small amber brand mark and an editorial serif display.
+ * No gradients, glows or decorative shadows. See DESIGN.md for the full
+ * guidelines.
  */
 @theme {
   --color-brew-bg: #141210;
@@ -27,6 +28,8 @@
 
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
     Roboto, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, "Times New Roman",
+    serif;
   --font-mono: ui-monospace, "SF Mono", Monaco, Menlo, Consolas, monospace;
 
   --ease-brew: cubic-bezier(0.2, 0.8, 0.2, 1);
