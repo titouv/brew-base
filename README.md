@@ -16,10 +16,11 @@ An independent browser for popular Homebrew casks. Pick the apps you need, then 
 BrewBase uses a modern interpretation of Homebrew's visual language, documented
 in [DESIGN.md](./DESIGN.md):
 
-- Espresso canvas with layered warm surfaces, amber actions and cream reading text
+- Neutral espresso canvas with three warm surface steps and cream reading text
+- Cream actions and selected states, with amber reserved for the brand mark
 - System sans-serif for prose and a monospace stack for commands and identifiers
-- Hairline amber-tinted borders, an 8/12/16px radius scale and low ambient shadows
-- Sticky top bar and command composer, split hero, responsive cask grid
+- Hairline neutral borders, a 6/8/12px radius scale, no gradients or shadows
+- Sticky top bar, full-bleed command bar, split hero and responsive cask grid
 - Visible keyboard focus, live copy feedback and reduced-motion support
 - Dark-first by design, preserving Homebrew's warm brown identity
 

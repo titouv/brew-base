@@ -1,13 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowDown,
-  ArrowUpRight,
-  Beer,
-  Code2,
-  Download,
-  Layers,
-  Package,
-} from "lucide-react";
+import { ArrowDown, ArrowUpRight, Beer, Code2 } from "lucide-react";
 import { getPackages } from "./data/packages";
 import PackageList from "./components/PackageList";
 
@@ -41,17 +33,12 @@ export default async function Home() {
             href="/"
             className="flex items-center gap-2.5 text-brew-strong hover:text-brew-strong hover:no-underline"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brew-amber/10 ring-1 ring-inset ring-brew-amber/20">
-              <Beer
-                className="h-5 w-5 text-brew-amber"
-                strokeWidth={1.75}
-                aria-hidden
-              />
-            </span>
+            <Beer
+              className="h-6 w-6 shrink-0 text-brew-amber"
+              strokeWidth={1.75}
+              aria-hidden
+            />
             <span className="text-lg font-bold tracking-tight">BrewBase</span>
-            <span className="hidden rounded-full border border-brew-border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brew-faint sm:inline">
-              Independent
-            </span>
           </Link>
 
           <nav aria-label="Primary" className="flex items-center gap-1">
@@ -82,7 +69,7 @@ export default async function Home() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="BrewBase source on GitHub (opens in a new tab)"
-              className="ml-1 flex h-10 w-10 items-center justify-center rounded-lg border border-brew-border text-brew-muted transition-colors hover:border-brew-border-strong hover:bg-brew-hover hover:text-brew-strong hover:no-underline"
+              className="ml-1 flex h-10 w-10 items-center justify-center rounded-lg text-brew-muted transition-colors hover:bg-brew-hover hover:text-brew-strong hover:no-underline"
             >
               <Code2 className="h-4 w-4" aria-hidden />
             </a>
@@ -93,15 +80,14 @@ export default async function Home() {
       <main id="main" className="mx-auto max-w-6xl px-4 sm:px-6">
         <section className="grid gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-brew-border bg-brew-surface px-3 py-1 text-xs font-semibold text-brew-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-brew-amber" />
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brew-faint">
               Independent Homebrew cask browser
-            </span>
+            </p>
 
-            <h1 className="mt-6 max-w-[13em] text-[clamp(2.6rem,5.5vw,4.4rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-brew-strong">
+            <h1 className="mt-5 max-w-[13em] text-[clamp(2.6rem,5.5vw,4.4rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-brew-strong">
               Pick your apps.
               <br />
-              <span className="text-brew-amber">Copy one command.</span>
+              Copy one command.
             </h1>
 
             <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-brew-muted">
@@ -112,7 +98,7 @@ export default async function Home() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
                 href="#casks"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brew-amber px-5 py-2.5 text-sm font-bold text-brew-on-amber transition-colors hover:bg-brew-amber-soft hover:no-underline active:scale-[0.98] motion-reduce:active:scale-100"
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brew-strong px-5 py-2.5 text-sm font-bold text-brew-bg transition-colors hover:bg-brew-text hover:no-underline active:scale-[0.98] motion-reduce:active:scale-100"
               >
                 Browse casks
                 <ArrowDown className="h-4 w-4" aria-hidden />
@@ -121,7 +107,7 @@ export default async function Home() {
                 href="https://brew.sh"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-brew-border bg-brew-surface px-5 py-2.5 text-sm font-semibold text-brew-text transition-colors hover:border-brew-border-strong hover:bg-brew-hover hover:text-brew-strong hover:no-underline"
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-brew-border px-5 py-2.5 text-sm font-semibold text-brew-text transition-colors hover:border-brew-border-strong hover:bg-brew-surface hover:text-brew-strong hover:no-underline"
               >
                 What is Homebrew?
                 <ArrowUpRight className="h-4 w-4" aria-hidden />
@@ -133,25 +119,11 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="relative">
-            <div
-              aria-hidden
-              className="absolute -inset-8 -z-10 rounded-[2rem] bg-[radial-gradient(closest-side,rgba(251,176,64,0.16),transparent)] blur-2xl"
-            />
-            <dl
-              aria-label="Catalogue statistics"
-              className="grid grid-cols-2 gap-3"
-            >
-              <div className="col-span-2 rounded-2xl border border-brew-border bg-brew-surface p-5 shadow-brew">
-                <dt className="flex items-start justify-between gap-4">
-                  <span className="text-sm font-medium text-brew-muted">
-                    Casks indexed
-                  </span>
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brew-amber/10 text-brew-amber ring-1 ring-inset ring-brew-amber/20">
-                    <Package className="h-5 w-5" aria-hidden />
-                  </span>
-                </dt>
-                <dd className="mt-3 text-5xl font-extrabold tracking-tight tabular-nums text-brew-strong">
+          <div className="rounded-xl border border-brew-border bg-brew-surface">
+            <dl className="grid grid-cols-2">
+              <div className="col-span-2 border-b border-brew-border p-6">
+                <dt className="text-sm text-brew-muted">Casks indexed</dt>
+                <dd className="mt-2 text-5xl font-extrabold tracking-tight tabular-nums text-brew-strong">
                   {stats.casks}
                 </dd>
                 <dd className="mt-2 text-xs text-brew-faint">
@@ -159,29 +131,15 @@ export default async function Home() {
                 </dd>
               </div>
 
-              <div className="rounded-2xl border border-brew-border bg-brew-surface p-4">
-                <dt className="text-xs font-medium text-brew-muted">
-                  <Layers
-                    className="mb-4 h-5 w-5 text-brew-amber"
-                    strokeWidth={1.75}
-                    aria-hidden
-                  />
-                  <span className="block">Categories</span>
-                </dt>
+              <div className="border-r border-brew-border p-5">
+                <dt className="text-xs text-brew-muted">Categories</dt>
                 <dd className="mt-1 text-2xl font-bold tabular-nums text-brew-strong">
                   {stats.categories}
                 </dd>
               </div>
 
-              <div className="rounded-2xl border border-brew-border bg-brew-surface p-4">
-                <dt className="text-xs font-medium text-brew-muted">
-                  <Download
-                    className="mb-4 h-5 w-5 text-brew-amber"
-                    strokeWidth={1.75}
-                    aria-hidden
-                  />
-                  <span className="block">Installs / year</span>
-                </dt>
+              <div className="p-5">
+                <dt className="text-xs text-brew-muted">Installs / year</dt>
                 <dd className="mt-1 text-2xl font-bold tabular-nums text-brew-strong">
                   {stats.installs}
                 </dd>
@@ -195,20 +153,15 @@ export default async function Home() {
           aria-labelledby="casks-heading"
           className="scroll-mt-24 pb-4"
         >
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2
-                id="casks-heading"
-                className="text-2xl font-bold tracking-tight text-brew-strong"
-              >
-                Browse casks
-              </h2>
-              <p className="mt-1 text-sm text-brew-muted">
-                Filter, sort and select the apps for your next Mac.
-              </p>
-            </div>
-            <p className="text-xs text-brew-faint">
-              365-day install analytics from formulae.brew.sh
+          <div className="mb-6">
+            <h2
+              id="casks-heading"
+              className="text-2xl font-bold tracking-tight text-brew-strong"
+            >
+              Browse casks
+            </h2>
+            <p className="mt-1 text-sm text-brew-muted">
+              Filter, sort and select the apps for your next Mac.
             </p>
           </div>
 
@@ -216,21 +169,12 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="mt-20 border-t border-brew-border bg-brew-bg/60">
+      <footer className="mt-16 border-t border-brew-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brew-amber/10 ring-1 ring-inset ring-brew-amber/20">
-                <Beer
-                  className="h-5 w-5 text-brew-amber"
-                  strokeWidth={1.75}
-                  aria-hidden
-                />
-              </span>
-              <span className="text-lg font-bold tracking-tight text-brew-strong">
-                BrewBase
-              </span>
-            </div>
+            <p className="text-lg font-bold tracking-tight text-brew-strong">
+              BrewBase
+            </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-brew-muted">
               A fast, independent way to assemble a Homebrew cask install
               command.

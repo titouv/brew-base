@@ -1,46 +1,46 @@
-# BrewBase design guidelines 2.0
+# BrewBase design guidelines 2.1
 
-BrewBase is an independent Homebrew cask browser. These guidelines are a modern
-interpretation of Homebrew's visual language, not a copy of the official
+BrewBase is an independent Homebrew cask browser. These guidelines are a clean,
+modern interpretation of Homebrew's visual language, not a copy of the official
 Homebrew website guidelines. They define how BrewBase looks, moves and reads.
 
-- Version: 2.0
+- Version: 2.1
 - Updated: 2026-11-02
 - Reference: [brew.sh](https://brew.sh)
 - Status: independent project, not affiliated with or endorsed by Homebrew
 
 ## Principles
 
-1. **Warm, not cold.** Brown, amber and cream carry the brand. Avoid blue-gray
-   developer-tool defaults, purple gradients and neon accents.
-2. **Terminal-native.** Commands, cask names and flags use monospace type and
-   look like something you can paste into a shell.
-3. **Quiet depth.** Hierarchy comes from layered warm surfaces and hairline
-   borders first, shadows second.
-4. **One obvious action.** The install command and its copy button are always
+1. **Clean first.** Remove decoration until only hierarchy, content and one
+   clear action remain.
+2. **Warm, not orange.** The palette is espresso, cream and stone. Amber is a
+   signature mark, not a surface color.
+3. **Terminal-native.** Commands and cask names use monospace type and look
+   like something you can paste into a shell.
+4. **Quiet depth.** Hierarchy comes from surface steps and hairline borders.
+   There are no gradients, glows or decorative shadows.
+5. **One obvious action.** The install command and its copy button are always
    the strongest elements on the page.
-5. **Accessible by default.** Keyboard access, visible focus, readable contrast
+6. **Accessible by default.** Keyboard access, visible focus, readable contrast
    and reduced motion are part of the design, not a later pass.
-6. **Modern, not trendy.** Use current layout, type and interaction standards
-   without chasing effects that will date the interface.
 
 ## What stays from Homebrew
 
-- The warm brown, amber and cream palette family
+- The warm brown family, cream type and one amber brand mark
 - System sans-serif for prose and monospace for shell content
 - Dark code panels with a visible `$` prompt
 - Cask and cellar vocabulary: casks, installs, formulae, Cellar
-- Flat borders, restrained shadows and a practical, unmarketed tone
+- Flat borders and a practical, unmarketed tone
 
 ## What changed from the brew.sh reference
 
-| brew.sh pattern | BrewBase 2.0 |
+| brew.sh pattern | BrewBase 2.1 |
 | --- | --- |
 | Centered hero in a 62em column | Split hero and 72rem content grid |
-| One flat brown plane | Espresso canvas with layered surface tokens |
-| Amber used for most body copy | Cream primary text, amber reserved for actions and accents |
-| `0.4em` radius nearly everywhere | 8px, 12px and 16px radius scale |
-| No elevation | Hairline borders plus low ambient shadows on floating chrome |
+| One flat brown plane | Neutral espresso canvas with three surface steps |
+| Amber used for body copy, links and buttons | Cream text and cream actions, amber only in the mark |
+| `0.4em` radius nearly everywhere | 6px, 8px and 12px radius scale |
+| No elevation | Hairline borders only, no drop shadows or glows |
 | Mostly static controls | Explicit hover, focus, pressed and selected states |
 | No motion language | 150–240ms transitions with a single easing curve |
 | Controls of mixed sizes | 44px primary targets and 36px compact targets |
@@ -50,8 +50,9 @@ light theme is intentionally out of scope.
 
 ## Brand and attribution
 
-- The beer icon is a generic Lucide glyph. Do not use the Homebrew logo, the
-  Homebrew wordmark or a redrawn version of either.
+- The beer icon is a generic Lucide glyph and the only amber element in the
+  interface. Do not use the Homebrew logo, the Homebrew wordmark or a redrawn
+  version of either.
 - Always link to `brew.sh` or `formulae.brew.sh` when referring to Homebrew,
   and keep the non-affiliation notice in the footer.
 - Write "Homebrew" as a proper noun. Do not stylize it in all caps or alter its
@@ -65,34 +66,35 @@ Use semantic tokens, never raw hex values in components.
 
 | Token | Value | Role |
 | --- | --- | --- |
-| `brew-bg` | `#17130E` | Page canvas |
-| `brew-surface` | `#1F1A14` | Cards, panels, sticky chrome |
-| `brew-raised` | `#272017` | Hover, nested controls, icon tiles |
-| `brew-hover` | `#30271C` | Strong hover fill |
-| `brew-code` | `#0F0C08` | Command and terminal panels |
-| `brew-border` | `rgba(255, 215, 154, 0.12)` | Default hairline |
-| `brew-border-strong` | `rgba(255, 215, 154, 0.26)` | Hover and emphasis hairline |
-| `brew-text` | `#F5E9D7` | Primary reading text |
-| `brew-strong` | `#FFFAF2` | Headings, values, command output |
-| `brew-muted` | `#B6A58C` | Secondary copy |
-| `brew-faint` | `#A69680` | Metadata and captions |
-| `brew-amber` | `#FBB040` | Primary action, brand accent |
-| `brew-amber-soft` | `#FFD79A` | Hover on amber, warm highlight |
-| `brew-amber-deep` | `#E2A843` | Inline links |
-| `brew-on-amber` | `#241A0C` | Text on amber fills |
+| `brew-bg` | `#141210` | Page canvas |
+| `brew-surface` | `#1B1815` | Cards, panels, inputs |
+| `brew-raised` | `#23201C` | Hover, selected, nested surfaces |
+| `brew-hover` | `#2B2722` | Strong hover fill |
+| `brew-code` | `#0D0C0A` | Command and terminal panels |
+| `brew-border` | `rgba(246, 238, 226, 0.10)` | Default hairline |
+| `brew-border-strong` | `rgba(246, 238, 226, 0.24)` | Hover and selected hairline |
+| `brew-text` | `#ECE5DA` | Primary reading text |
+| `brew-strong` | `#FBF7F0` | Headings, values, primary actions |
+| `brew-muted` | `#B0A89C` | Secondary copy |
+| `brew-faint` | `#9A9388` | Metadata and captions |
+| `brew-amber` | `#FBB040` | Brand mark only |
 | `brew-green` | `#8FD6A4` | Positive growth, success |
 | `brew-red` | `#FF9D97` | Negative growth, errors |
-| `brew-cyan` | `#87C7D8` | Command flags and focus ring |
+| `brew-focus` | `#87C7D8` | Keyboard focus ring |
 
 Rules:
 
-- Amber is for one primary action per view, plus links, focus and small brand
-  moments. Do not use it as a page-wide background wash.
+- Amber appears in the header mark and the favicon only. Do not fill buttons,
+  chips, borders or headings with amber.
+- Primary actions use the cream `brew-strong` fill with `brew-bg` text.
+  Selected chips, selected cards and active segments use the same cream fill or
+  a neutral raised surface.
+- Links use `brew-text` and become `brew-strong` on hover, with an underline.
 - Never communicate state with color alone. Pair green and red with an arrow,
   a sign, an icon or a label.
 - Contrast targets: primary text and actions meet WCAG AA at 4.5:1 minimum.
-  Muted text must remain readable at 14px.
-- Keep `brew-on-amber` dark. White text on `brew-amber` does not pass contrast.
+  Muted text must remain readable at 12px.
+- No gradients. No glows. No translucent colored washes.
 
 ## Typography
 
@@ -124,6 +126,8 @@ Rules:
 - Do not use more than three weights on one screen.
 - Sentence case for headings and buttons. Uppercase only for small labels.
 - Keep body copy at 16px or larger. Never shrink disclaimers below 12px.
+- Keep the display hierarchy monochrome. Emphasis comes from size and weight,
+  not from a second accent color.
 
 ## Layout
 
@@ -132,37 +136,34 @@ Rules:
 - Grid: single column on mobile, two columns on tablet, three on desktop.
 - Spacing follows a 4px base: 4, 8, 12, 16, 24, 32, 48, 64 and 80.
 - Section rhythm: 64px on mobile, 80px on desktop.
-- Sticky chrome: a 64px top bar and a compact command composer below it.
+- Sticky chrome: a 64px top bar and a full-bleed command bar directly below it.
   Add `scroll-margin-top` to anchor targets so the header never covers a
   heading.
-- The command composer stays visible while browsing. It must not grow taller
-  than two compact rows on mobile.
+- The command composer stays visible while browsing and must not exceed two
+  compact rows on mobile.
 
-## Surfaces, borders and elevation
+## Surfaces, borders and radius
 
-- Surfaces step up in warmth, not in brightness: canvas, surface, raised,
-  hover.
-- Default border is a 1px amber-tinted hairline. Strong borders are for hover
+- Surfaces step up in warmth, not in brightness: canvas, surface, raised, hover.
+- Default border is a 1px neutral warm hairline. Strong borders are for hover
   and selected states.
 - Use `6px` for tiny elements such as check boxes and keycaps, `8px` for
-  controls, `12px` for secondary panels and `16px` for cards and major panels.
-  Pills are reserved for tags, chips and status.
-- Shadows are ambient and warm-black, never colored. Use the default shadow for
-  floating chrome and the lift shadow only on card hover.
-- Backdrop blur is allowed on the sticky top bar and command composer. Do not
-  use it on cards, menus or the page background.
-- No gradients except a single, low-opacity amber radial glow in the page
-  background and behind the hero stats. It supports the brand and must remain
-  decorative (`aria-hidden`).
+  controls and `12px` for panels and cards. Pills are reserved for tags, chips
+  and status.
+- No box shadows. No glows. Separate layers with a border and a surface step.
+- Backdrop blur is allowed on the sticky top bar and command bar only. Do not
+  use it on cards or menus.
+- No gradients or patterned backgrounds. The page canvas is a single flat
+  color.
 
 ## Motion
 
 - Duration: 150ms for hover and color changes, 200ms for menus and transforms,
   240ms maximum for any other transition.
 - Easing: `cubic-bezier(0.2, 0.8, 0.2, 1)`.
-- Animate color, border, shadow, opacity and small transforms only. Do not
-  animate layout properties.
-- Pressed buttons may scale to `0.98`. Cards do not bounce or lift far.
+- Animate color, border, opacity and small transforms only. Do not animate
+  layout properties.
+- Pressed buttons may scale to `0.98`. Cards do not bounce or lift.
 - Honor `prefers-reduced-motion: reduce` by removing transforms, smooth scroll
   and non-essential transitions.
 
@@ -171,51 +172,57 @@ Rules:
 ### Top bar
 
 - Sticky, 64px tall, translucent page color with a bottom hairline and blur.
-- Brand mark in an amber-tinted tile, wordmark in cream, optional "Independent"
-  badge.
-- Text links are muted by default and become cream on hover. The GitHub action
-  is a bordered 40px icon button.
+- Wordmark in cream, with the amber beer mark at 24px.
+- Text links are muted by default and become cream on hover. The source action
+  is a ghost 40px icon button.
 - Hide secondary links before wrapping the bar onto two lines.
 
 ### Command composer
 
-- The strongest surface on the page: a raised panel with a terminal icon, a
-  dark code well and a solid amber copy group.
-- Render the command with semantic syntax colors: `brew` amber, `install`
-  cream, flags cyan or muted, cask names green, prompt faint.
-- The primary button copies the command immediately. The attached chevron
-  opens secondary options and must be a separate 36–44px target.
+- A full-bleed sticky bar under the top bar. It uses the page color, a bottom
+  hairline, blur and a single dark code well.
+- Render the command in monochrome: `brew` strong, `install` muted, flags
+  faint and cask names cream. No syntax rainbow.
+- The primary button copies the command immediately and uses the cream fill.
+  The attached chevron opens secondary options and must be a separate 36–44px
+  target.
 - When nothing is selected, the composer is muted and the copy action is
   disabled. Never copy an incomplete command.
 - Announce copy success in a live region and show a two-second visual state.
-- Close the options menu on outside press and Escape.
+- Close the options menu on outside press and Escape. Menus use borders, not
+  shadows.
 
 ### Search and filters
 
-- Search sits on a bordered field with a leading icon and a trailing `/`
+- Search sits in a bordered field with a leading icon and a trailing `/`
   keyboard hint on desktop.
 - `/` focuses search from anywhere outside an editable field. Escape clears and
   blurs.
-- Sort is a segmented control with the selected segment on amber.
+- Sort is a segmented control with the selected segment on cream.
 - Category chips are pills with a count. Unselected chips are muted with a
-  hairline; selected chips use the amber fill.
+  hairline; selected chips use the cream fill.
+- Use a single thin dividing rhythm, not a card around the whole toolbar.
 - Keep the result count in a live region. Show the selection count beside it.
 
 ### Cask cards
 
 - Whole-card selection with a visible check box. Support Enter and Space.
-- Icon tile is 44px, white, and padded so transparent and full-bleed icons
+- Icon tile is 44px, cream, and padded so transparent and full-bleed icons
   share the same optical size.
 - Show rank, category, description, yearly installs and growth. Truncate names
   and clamp descriptions to two lines.
-- Selected state changes border, tint and check mark. Hover only shifts surface
-  and border. Do not rely on hover for essential information.
-- Use a dashed border and a centered icon for the empty state.
+- Default cards use the surface token and a hairline border. Hover and selected
+  states step up to the raised surface and a strong border. No shadows.
+- Selected state also changes the check mark. Hover does not carry essential
+  information.
+- Use a bordered panel with a centered icon for the empty state.
 
-### Menus and empty states
+### Menus and footer
 
-- Menus use the surface token, a hairline border, a 12px radius and a soft
-  ambient shadow. Items include a title and one line of supporting copy.
+- Menus use the surface token, a hairline border and a 12px radius. Items
+  include a title and one line of supporting copy.
+- The footer uses three columns on desktop and one on mobile. Keep the
+  non-affiliation notice visible but low emphasis.
 - Empty states explain what happened and offer the action that fixes it.
 
 ## Accessibility
@@ -247,10 +254,10 @@ Rules:
 
 ## Implementation
 
-- Define colors, fonts, shadows and easing in `@theme` in `app/globals.css`.
-  Use the generated `brew-*` utilities in components.
-- Do not introduce a component library or a webfont without updating these
-  guidelines first.
+- Define colors, fonts and easing in `@theme` in `app/globals.css`. Use the
+  generated `brew-*` utilities in components.
+- Do not introduce a component library, a webfont, a gradient or a shadow
+  without updating these guidelines first.
 - Keep one source of truth for tokens. A raw hex value in a component is a bug.
 - Re-check `bun run lint` and `bun run build` before shipping a design change.
 - Verify the page at 320px, 768px, 1024px and 1440px, with reduced motion and
