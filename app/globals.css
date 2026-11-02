@@ -1,47 +1,74 @@
 @import "tailwindcss";
 
 /*
- * BrewBase follows the Homebrew website design language (brew.sh):
- * a warm brown shell, amber reading text, cream highlights, hairline
- * brown borders, 0.4em radii and system sans/mono type.
- * https://brew.sh
+ * BrewBase design system 2.0
+ *
+ * A modern interpretation of Homebrew's warm, terminal-native identity:
+ * espresso canvas, amber accent, cream type, layered warm surfaces and
+ * restrained motion. See DESIGN.md for the full guidelines.
  */
 @theme {
-  --color-brew-bg: #2e2a24;
-  --color-brew-surface: rgba(255, 255, 255, 0.06);
-  --color-brew-surface-hover: rgba(255, 255, 255, 0.1);
-  --color-brew-code: rgba(0, 0, 0, 0.3);
-  --color-brew-border: rgba(162, 107, 20, 0.3);
-  --color-brew-border-strong: rgba(162, 107, 20, 0.6);
-  --color-brew-text: #ffd79a;
-  --color-brew-strong: #ffffff;
-  --color-brew-soft: #cbbda8;
-  --color-brew-link: #e2a843;
-  --color-brew-link-hover: #f7c96c;
-  --color-brew-focus: #87c7d8;
-  --color-brew-selection: #745626;
+  --color-brew-bg: #17130e;
+  --color-brew-surface: #1f1a14;
+  --color-brew-raised: #272017;
+  --color-brew-hover: #30271c;
+  --color-brew-code: #0f0c08;
+  --color-brew-border: rgba(255, 215, 154, 0.12);
+  --color-brew-border-strong: rgba(255, 215, 154, 0.26);
+  --color-brew-text: #f5e9d7;
+  --color-brew-strong: #fffaf2;
+  --color-brew-muted: #b6a58c;
+  --color-brew-faint: #a69680;
   --color-brew-amber: #fbb040;
-  --color-brew-green: #a8d8a8;
-  --color-brew-red: #ee918f;
+  --color-brew-amber-soft: #ffd79a;
+  --color-brew-amber-deep: #e2a843;
+  --color-brew-on-amber: #241a0c;
+  --color-brew-green: #8fd6a4;
+  --color-brew-red: #ff9d97;
+  --color-brew-cyan: #87c7d8;
+  --color-brew-focus: #87c7d8;
+  --color-brew-selection: #6b4d22;
 
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
     Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Monaco, Menlo, Consolas, monospace;
 
-  --radius-brew: 0.4em;
+  --shadow-brew: 0 1px 2px rgba(0, 0, 0, 0.4), 0 24px 48px -32px rgba(0, 0, 0, 0.9);
+  --shadow-brew-lift: 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 24px 48px -20px rgba(0, 0, 0, 0.85);
+
+  --ease-brew: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @layer base {
   html {
     color-scheme: dark;
+    scroll-behavior: smooth;
   }
 
   body {
     background-color: var(--color-brew-bg);
+    background-image: radial-gradient(
+      70rem 45rem at 85% -15%,
+      rgba(251, 176, 64, 0.09),
+      transparent 65%
+    );
+    background-repeat: no-repeat;
     color: var(--color-brew-text);
     font-family: var(--font-sans);
     font-size: 1rem;
-    line-height: 1.48;
+    line-height: 1.6;
+    font-synthesis-weight: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   ::selection {
@@ -50,28 +77,47 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-brew-focus);
-    outline-offset: 3px;
+    outline: 2px solid var(--color-brew-focus);
+    outline-offset: 2px;
   }
 
   a {
-    color: var(--color-brew-link);
-    font-weight: 700;
+    color: var(--color-brew-amber-deep);
+    font-weight: 600;
     text-decoration: none;
   }
 
   a:hover {
-    color: var(--color-brew-link-hover);
+    color: var(--color-brew-amber-soft);
     text-decoration: underline;
+    text-underline-offset: 0.18em;
   }
 
   code,
   pre {
     font-family: var(--font-mono);
   }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-brew-border-strong) transparent;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --color-brew-muted: #d8cbb8;
+    --color-brew-faint: #b6a58c;
+    --color-brew-border: rgba(255, 215, 154, 0.3);
+    --color-brew-border-strong: rgba(255, 215, 154, 0.5);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {

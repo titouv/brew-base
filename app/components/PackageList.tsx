@@ -3,13 +3,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BrewPackage } from "../data/packages";
 import {
-  TrendingDownIcon,
-  TrendingUpIcon,
-  Copy,
-  ChevronDown,
   CheckIcon,
+  ChevronDown,
+  Copy,
+  Download,
   SearchIcon,
   SearchXIcon,
+  Terminal,
+  TrendingDownIcon,
+  TrendingUpIcon,
+  XIcon,
 } from "lucide-react";
 
 interface PackageListProps {
@@ -34,7 +37,7 @@ function PackageIcon({ name, iconUrl }: { name: string; iconUrl?: string }) {
   if (!iconUrl || failed) {
     return (
       <span
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-brew border border-brew-border bg-brew-surface text-lg font-bold text-brew-text"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-brew-border bg-brew-raised text-lg font-bold text-brew-amber"
         aria-hidden
       >
         {name.charAt(0).toUpperCase()}
@@ -44,17 +47,44 @@ function PackageIcon({ name, iconUrl }: { name: string; iconUrl?: string }) {
 
   // The padded tile gives full-bleed and transparent icons the same breathing room.
   return (
-    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-brew border border-brew-border bg-white p-1.5">
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-brew-border bg-brew-strong p-1.5">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={iconUrl}
         alt=""
-        className="h-full w-full rounded-[0.2em] object-contain"
+        className="h-full w-full rounded-lg object-contain"
         loading="lazy"
         decoding="async"
         referrerPolicy="no-referrer"
         onError={() => setFailed(true)}
       />
+    </span>
+  );
+}
+
+function CommandText({ command }: { command: string }) {
+  const [head, ...tokens] = command.split(" ");
+
+  return (
+    <span className="whitespace-nowrap">
+      <span className="text-brew-amber">{head}</span>{" "}
+      {tokens.map((token, index) => {
+        const color =
+          token === "--cask"
+            ? "text-brew-cyan"
+            : token.startsWith("-")
+              ? "text-brew-muted"
+              : index === 0
+                ? "text-brew-text"
+                : "text-brew-green";
+
+        return (
+          <span key={`${token}-${index}`} className={color}>
+            {token}
+            {index < tokens.length - 1 ? " " : ""}
+          </span>
+        );
+      })}
     </span>
   );
 }
@@ -71,6 +101,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
   const [showCopyOptions, setShowCopyOptions] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const copyMenuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!copiedCommand) return;
@@ -97,6 +128,28 @@ export default function PackageList({ initialPackages }: PackageListProps) {
       document.removeEventListener("keydown", closeOnEscape);
     };
   }, [showCopyOptions]);
+
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      if (
+        event.key !== "/" ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, [contenteditable='true']")) return;
+
+      event.preventDefault();
+      searchRef.current?.focus();
+    };
+
+    window.addEventListener("keydown", focusSearch);
+    return () => window.removeEventListener("keydown", focusSearch);
+  }, []);
 
   const togglePackage = (packageId: string) => {
     const newSelected = new Set(selectedPackages);
@@ -172,139 +225,190 @@ export default function PackageList({ initialPackages }: PackageListProps) {
     setQuery("");
   };
 
+  const hasSelection = selectedPackages.size > 0;
+
   return (
     <>
-      <div className="sticky top-3 z-20 mb-8 bg-brew-bg">
-        <div className="flex items-stretch rounded-brew border border-brew-border bg-brew-code">
-          <code className="flex min-h-11 min-w-0 flex-1 items-center gap-2 overflow-x-auto whitespace-nowrap rounded-l-brew px-4 py-3 font-mono text-sm">
-            <span className="select-none text-brew-green" aria-hidden>
-              $
-            </span>
-            <span
-              className={
-                selectedPackages.size === 0
-                  ? "text-brew-soft"
-                  : "text-brew-strong"
-              }
+      <div className="sticky top-[4.5rem] z-30 mb-6">
+        <div className="rounded-2xl border border-brew-border bg-brew-surface/85 p-2.5 shadow-brew backdrop-blur-xl">
+          <div className="flex items-stretch gap-2">
+            <div
+              className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brew-amber/10 text-brew-amber ring-1 ring-inset ring-brew-amber/20 sm:flex"
+              aria-hidden
             >
-              {getBrewCommand()}
-            </span>
-            {selectedPackages.size === 0 && (
-              <span className="font-sans text-xs text-brew-soft">
-                Select casks below
-              </span>
-            )}
-          </code>
+              <Terminal className="h-4 w-4" />
+            </div>
 
-          {selectedPackages.size > 0 && (
-            <button
-              type="button"
-              onClick={() => setSelectedPackages(new Set())}
-              className="min-h-11 shrink-0 border-l border-brew-border px-3 text-xs font-bold text-brew-link transition-colors hover:bg-brew-selection hover:text-brew-link-hover"
-            >
-              <span className="sm:hidden">Clear</span>
-              <span className="hidden sm:inline">
-                Clear {selectedPackages.size}
-              </span>
-            </button>
-          )}
-
-          <div ref={copyMenuRef} className="relative flex shrink-0">
-            <button
-              type="button"
-              onClick={() => setShowCopyOptions(!showCopyOptions)}
-              className={`flex min-h-11 items-center gap-2 rounded-r-brew border-l border-brew-border px-4 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-                copiedCommand
-                  ? "bg-brew-selection text-brew-strong"
-                  : "bg-brew-code text-brew-text enabled:hover:bg-brew-selection enabled:hover:text-brew-strong"
-              }`}
-              title="Copy options"
-              aria-label="Copy options"
-              aria-haspopup="menu"
-              aria-expanded={showCopyOptions}
-              disabled={selectedPackages.size === 0}
-            >
-              {copiedCommand ? (
-                <>
-                  <CheckIcon className="h-4 w-4" aria-hidden />
-                  Copied
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4" aria-hidden />
-                  Copy
-                  <ChevronDown className="h-4 w-4" aria-hidden />
-                </>
+            <div className="flex min-h-11 min-w-0 flex-1 items-center overflow-x-auto rounded-xl border border-brew-border bg-brew-code px-3 font-mono text-sm">
+              <code className="flex items-center">
+                <span className="mr-2 select-none text-brew-faint" aria-hidden>
+                  $
+                </span>
+                <CommandText command={getBrewCommand()} />
+              </code>
+              {!hasSelection && (
+                <span className="ml-3 whitespace-nowrap font-sans text-xs text-brew-faint">
+                  Select casks below
+                </span>
               )}
-            </button>
+            </div>
 
-            {showCopyOptions && (
+            {hasSelection && (
+              <button
+                type="button"
+                onClick={() => setSelectedPackages(new Set())}
+                aria-label={`Clear ${selectedPackages.size} selected casks`}
+                className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl border border-brew-border px-2.5 text-xs font-semibold text-brew-muted transition-colors hover:border-brew-border-strong hover:bg-brew-hover hover:text-brew-strong md:justify-start"
+              >
+                <XIcon className="h-3.5 w-3.5" aria-hidden />
+                <span className="hidden md:inline">
+                  Clear {selectedPackages.size}
+                </span>
+              </button>
+            )}
+
+            <div ref={copyMenuRef} className="relative flex shrink-0 items-stretch">
               <div
-                role="menu"
-                aria-label="Copy options"
-                className="absolute right-0 top-full z-30 mt-2 w-72 overflow-hidden rounded-brew border border-brew-border bg-brew-bg shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
+                className={`flex items-stretch overflow-hidden rounded-xl ${
+                  hasSelection
+                    ? "bg-brew-amber text-brew-on-amber"
+                    : "bg-brew-raised text-brew-faint"
+                }`}
               >
                 <button
                   type="button"
-                  role="menuitem"
                   onClick={() =>
                     copyToClipboard(getBrewCommand(false), "standard")
                   }
-                  className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm text-brew-text transition-colors hover:bg-brew-selection hover:text-brew-strong"
+                  disabled={!hasSelection}
+                  className="flex min-h-11 items-center gap-2 px-3.5 text-sm font-bold transition-colors enabled:hover:bg-brew-amber-soft disabled:cursor-not-allowed"
                 >
-                  <Copy
-                    className="mt-0.5 h-4 w-4 shrink-0 text-brew-soft"
-                    aria-hidden
-                  />
-                  <span>
-                    Copy <code className="text-brew-soft">brew install</code>{" "}
-                    command
+                  {copiedCommand ? (
+                    <CheckIcon className="h-4 w-4" aria-hidden />
+                  ) : (
+                    <Copy className="h-4 w-4" aria-hidden />
+                  )}
+                  <span className="hidden sm:inline">
+                    {copiedCommand ? "Copied" : "Copy"}
                   </span>
                 </button>
                 <button
                   type="button"
-                  role="menuitem"
-                  onClick={() =>
-                    copyToClipboard(getBrewCommand(true), "withInstall")
-                  }
-                  className="flex w-full items-start gap-3 border-t border-brew-border px-4 py-3 text-left text-sm text-brew-text transition-colors hover:bg-brew-selection hover:text-brew-strong"
+                  onClick={() => setShowCopyOptions(!showCopyOptions)}
+                  disabled={!hasSelection}
+                  aria-label="More copy options"
+                  aria-haspopup="menu"
+                  aria-expanded={showCopyOptions}
+                  aria-controls={showCopyOptions ? "copy-menu" : undefined}
+                  className={`flex min-h-11 w-9 items-center justify-center border-l transition-colors enabled:hover:bg-brew-amber-soft disabled:cursor-not-allowed ${
+                    hasSelection
+                      ? "border-brew-on-amber/15"
+                      : "border-brew-border"
+                  }`}
                 >
-                  <Copy
-                    className="mt-0.5 h-4 w-4 shrink-0 text-brew-soft"
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform duration-200 ease-brew ${
+                      showCopyOptions ? "rotate-180" : ""
+                    }`}
                     aria-hidden
                   />
-                  <span>Copy with Homebrew installation</span>
                 </button>
               </div>
-            )}
+
+              {showCopyOptions && (
+                <div
+                  id="copy-menu"
+                  role="menu"
+                  aria-label="Copy options"
+                  className="absolute right-0 top-full z-40 mt-2 w-80 overflow-hidden rounded-xl border border-brew-border bg-brew-surface shadow-brew"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() =>
+                      copyToClipboard(getBrewCommand(false), "standard")
+                    }
+                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-brew-hover"
+                  >
+                    <Copy
+                      className="mt-0.5 h-4 w-4 shrink-0 text-brew-amber"
+                      aria-hidden
+                    />
+                    <span>
+                      <span className="block text-sm font-semibold text-brew-text">
+                        Copy command
+                      </span>
+                      <span className="mt-0.5 block text-xs text-brew-faint">
+                        Just the brew install command
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() =>
+                      copyToClipboard(getBrewCommand(true), "withInstall")
+                    }
+                    className="flex w-full items-start gap-3 border-t border-brew-border px-4 py-3 text-left transition-colors hover:bg-brew-hover"
+                  >
+                    <Download
+                      className="mt-0.5 h-4 w-4 shrink-0 text-brew-amber"
+                      aria-hidden
+                    />
+                    <span>
+                      <span className="block text-sm font-semibold text-brew-text">
+                        Copy with Homebrew
+                      </span>
+                      <span className="mt-0.5 block text-xs text-brew-faint">
+                        Includes the official installer script
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
+
+          <span className="sr-only" role="status">
+            {copiedCommand ? "Command copied to clipboard" : ""}
+          </span>
         </div>
-        <span className="sr-only" role="status">
-          {copiedCommand ? "Command copied to clipboard" : ""}
-        </span>
       </div>
 
-      <div className="mb-6 space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="mb-6 rounded-2xl border border-brew-border bg-brew-surface p-3 sm:p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative flex-1">
             <SearchIcon
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brew-soft"
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brew-faint"
               aria-hidden
             />
             <input
+              ref={searchRef}
               type="search"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search casks…"
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  setQuery("");
+                  event.currentTarget.blur();
+                }
+              }}
+              placeholder="Search casks, identifiers or descriptions"
               aria-label="Search casks"
-              className="min-h-11 w-full rounded-brew border border-brew-border bg-brew-surface py-2.5 pl-10 pr-4 text-sm text-brew-strong placeholder:text-brew-soft/70"
+              aria-keyshortcuts="/"
+              autoComplete="off"
+              spellCheck={false}
+              className="min-h-11 w-full rounded-xl border border-brew-border bg-brew-bg/60 py-2.5 pl-10 pr-14 text-sm text-brew-strong placeholder:text-brew-faint transition-colors focus:border-brew-border-strong"
             />
+            <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center rounded-md border border-brew-border bg-brew-raised px-1.5 py-0.5 font-mono text-[10px] font-semibold text-brew-faint sm:flex">
+              /
+            </kbd>
           </div>
 
           <div
             role="group"
             aria-label="Sort by"
-            className="inline-flex shrink-0 self-start rounded-brew border border-brew-border bg-brew-surface p-1 sm:self-auto"
+            className="inline-flex shrink-0 self-start rounded-xl border border-brew-border bg-brew-bg/60 p-1 lg:self-auto"
           >
             {SORT_OPTIONS.map((option) => (
               <button
@@ -312,10 +416,10 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 type="button"
                 onClick={() => setSortBy(option.value)}
                 aria-pressed={sortBy === option.value}
-                className={`min-h-11 rounded-[0.25em] px-3.5 py-1.5 text-sm transition-colors ${
+                className={`min-h-10 rounded-lg px-4 text-sm transition-colors ${
                   sortBy === option.value
-                    ? "bg-brew-text font-bold text-brew-bg"
-                    : "font-semibold text-brew-text hover:bg-brew-surface-hover"
+                    ? "bg-brew-amber font-semibold text-brew-on-amber"
+                    : "font-medium text-brew-muted hover:bg-brew-hover hover:text-brew-text"
                 }`}
               >
                 {option.label}
@@ -324,7 +428,7 @@ export default function PackageList({ initialPackages }: PackageListProps) {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-brew-border pt-3">
           {categories.map(({ name, count }) => {
             const active = selectedCategories.has(name);
             return (
@@ -333,14 +437,16 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                 type="button"
                 onClick={() => toggleCategory(name)}
                 aria-pressed={active}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-brew border px-3 py-1.5 text-sm transition-colors ${
+                className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors ${
                   active
-                    ? "border-brew-text bg-brew-text font-bold text-brew-bg"
-                    : "border-brew-border bg-brew-surface font-semibold text-brew-text hover:bg-brew-surface-hover"
+                    ? "border-brew-amber bg-brew-amber text-brew-on-amber"
+                    : "border-brew-border bg-brew-bg/40 text-brew-muted hover:border-brew-border-strong hover:text-brew-text"
                 }`}
               >
                 {name}
-                <span className="text-xs tabular-nums opacity-70">{count}</span>
+                <span className="text-[10px] tabular-nums opacity-60">
+                  {count}
+                </span>
               </button>
             );
           })}
@@ -348,37 +454,42 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             <button
               type="button"
               onClick={clearFilters}
-              className="ml-1 min-h-11 px-1 text-sm font-bold text-brew-link transition-colors hover:text-brew-link-hover hover:underline"
+              className="min-h-9 px-2 text-xs font-semibold text-brew-amber-deep transition-colors hover:text-brew-amber-soft hover:underline"
             >
               Clear filters
             </button>
           )}
         </div>
 
-        <p className="text-sm text-brew-soft" aria-live="polite">
-          Showing {visiblePackages.length}{" "}
-          {visiblePackages.length === 1 ? "cask" : "casks"}
-          {selectedPackages.size > 0 && ` · ${selectedPackages.size} selected`}
-        </p>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-brew-faint">
+          <p aria-live="polite">
+            Showing {visiblePackages.length}{" "}
+            {visiblePackages.length === 1 ? "cask" : "casks"}
+          </p>
+          {hasSelection && (
+            <p className="font-medium text-brew-amber-soft">
+              {selectedPackages.size} selected
+            </p>
+          )}
+        </div>
       </div>
 
       {visiblePackages.length === 0 ? (
-        <div className="py-16 text-center">
-          <SearchXIcon
-            className="mx-auto mb-4 h-10 w-10 text-brew-soft"
-            aria-hidden
-          />
-          <h3 className="mb-2 text-xl font-bold text-brew-strong">
+        <div className="rounded-2xl border border-dashed border-brew-border-strong bg-brew-surface/40 px-6 py-16 text-center">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brew-raised text-brew-faint">
+            <SearchXIcon className="h-6 w-6" aria-hidden />
+          </span>
+          <h3 className="mt-4 text-xl font-bold text-brew-strong">
             No casks found
           </h3>
-          <p className="mb-5 text-brew-text">
+          <p className="mx-auto mt-1 max-w-sm text-sm text-brew-muted">
             Try a different search or remove a filter.
           </p>
           {hasFilters && (
             <button
               type="button"
               onClick={clearFilters}
-              className="min-h-11 rounded-brew border border-brew-border bg-brew-surface px-4 py-2 text-sm font-bold text-brew-text transition-colors hover:bg-brew-surface-hover"
+              className="mt-5 min-h-11 rounded-xl border border-brew-border bg-brew-surface px-4 py-2 text-sm font-semibold text-brew-text transition-colors hover:border-brew-border-strong hover:bg-brew-hover"
             >
               Clear all filters
             </button>
@@ -391,56 +502,62 @@ export default function PackageList({ initialPackages }: PackageListProps) {
             return (
               <div
                 key={pkg.id}
-                className={`relative flex cursor-pointer flex-col rounded-brew border p-5 transition-colors ${
+                className={`group relative flex cursor-pointer flex-col rounded-2xl border p-5 transition-[background-color,border-color,box-shadow] duration-200 ease-brew ${
                   selected
-                    ? "border-brew-text bg-brew-surface-hover"
-                    : "border-brew-border bg-brew-surface hover:border-brew-border-strong hover:bg-brew-surface-hover"
+                    ? "border-brew-amber/60 bg-brew-amber/[0.06] shadow-brew"
+                    : "border-brew-border bg-brew-surface hover:border-brew-border-strong hover:bg-brew-raised hover:shadow-brew-lift"
                 }`}
                 onClick={() => togglePackage(pkg.id)}
                 tabIndex={0}
                 role="button"
                 aria-pressed={selected}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
                     togglePackage(pkg.id);
                   }
                 }}
               >
                 <span
-                  className={`absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-[0.2em] border transition-colors ${
+                  className={`absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-md border transition-colors ${
                     selected
-                      ? "border-brew-text bg-brew-text text-brew-bg"
-                      : "border-brew-soft/60"
+                      ? "border-brew-amber bg-brew-amber text-brew-on-amber"
+                      : "border-brew-border-strong bg-brew-bg/50 text-transparent group-hover:border-brew-muted"
                   }`}
                   aria-hidden
                 >
-                  {selected && <CheckIcon className="h-3.5 w-3.5" />}
+                  <CheckIcon className="h-3.5 w-3.5" />
                 </span>
 
                 <div className="mb-3 flex items-center gap-3 pr-8">
                   <PackageIcon name={pkg.name} iconUrl={pkg.iconUrl} />
                   <div className="min-w-0">
-                    <h3 className="truncate text-base font-bold leading-tight text-brew-strong">
+                    <h3
+                      className="truncate text-[0.95rem] font-semibold leading-tight text-brew-strong"
+                      title={pkg.name}
+                    >
                       {pkg.name}
                     </h3>
-                    <p className="mt-0.5 text-xs text-brew-soft">
+                    <p className="mt-0.5 text-xs text-brew-faint">
                       #{rank} · {pkg.category}
                     </p>
                   </div>
                 </div>
 
-                <p className="mb-4 line-clamp-2 min-h-10 text-sm text-brew-text">
+                <p
+                  className="mb-4 line-clamp-2 min-h-10 text-sm leading-relaxed text-brew-muted"
+                  title={pkg.description || undefined}
+                >
                   {pkg.description || "No description available"}
                 </p>
 
                 <div className="mt-auto flex items-center justify-between gap-3 border-t border-brew-border pt-3 text-xs">
                   {pkg.installCount !== undefined ? (
                     <span
-                      className="text-brew-soft"
+                      className="text-brew-faint"
                       title={`${pkg.installCount.toLocaleString()} installations in the last year`}
                     >
-                      <span className="font-bold tabular-nums text-brew-strong">
+                      <span className="font-semibold tabular-nums text-brew-text">
                         {compact.format(pkg.installCount)}
                       </span>{" "}
                       installs / year
@@ -450,10 +567,10 @@ export default function PackageList({ initialPackages }: PackageListProps) {
                   )}
                   {pkg.growthPercentage !== undefined && (
                     <span
-                      className={`inline-flex shrink-0 items-center gap-1 font-bold tabular-nums ${
+                      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-semibold tabular-nums ${
                         pkg.growthPercentage >= 0
-                          ? "text-brew-green"
-                          : "text-brew-red"
+                          ? "bg-brew-green/10 text-brew-green"
+                          : "bg-brew-red/10 text-brew-red"
                       }`}
                       title="Change in daily installs compared with the previous year"
                     >

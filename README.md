@@ -13,13 +13,15 @@ An independent browser for popular Homebrew casks. Pick the apps you need, then 
 
 ## Design
 
-BrewBase follows the [Homebrew website](https://brew.sh) design language:
+BrewBase uses a modern interpretation of Homebrew's visual language, documented
+in [DESIGN.md](./DESIGN.md):
 
-- Warm brown shell `#2E2A24` with amber text `#FFD79A`, cream highlights and gold links
+- Espresso canvas with layered warm surfaces, amber actions and cream reading text
 - System sans-serif for prose and a monospace stack for commands and identifiers
-- Hairline brown borders (`rgba(162, 107, 20, 0.3)`), `0.4em` radii and flat surfaces, with no gradients or glass effects
-- Cyan `#87C7D8` focus outlines and a minimum 44px target for controls
-- Dark theme only, matching brew.sh
+- Hairline amber-tinted borders, an 8/12/16px radius scale and low ambient shadows
+- Sticky top bar and command composer, split hero, responsive cask grid
+- Visible keyboard focus, live copy feedback and reduced-motion support
+- Dark-first by design, preserving Homebrew's warm brown identity
 
 The beer mark in the navigation is a generic icon, not the Homebrew logo. BrewBase is not affiliated with or endorsed by Homebrew.
 

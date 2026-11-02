@@ -6,11 +6,18 @@ export const metadata: Metadata = {
   description:
     "Browse the most installed Homebrew casks, pick the apps you need and copy a single brew install command.",
   applicationName: "BrewBase",
+  openGraph: {
+    title: "BrewBase",
+    description:
+      "Pick the Homebrew casks you need and copy a single brew install command.",
+    type: "website",
+    siteName: "BrewBase",
+  },
 };
 
 export const viewport: Viewport = {
   colorScheme: "dark",
-  themeColor: "#2e2a24",
+  themeColor: "#17130e",
 };
 
 export default function RootLayout({
