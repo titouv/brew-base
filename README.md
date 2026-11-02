@@ -19,6 +19,7 @@ A modern web application that helps Mac users discover and install popular Homeb
 - React 19
 - TypeScript
 - Tailwind CSS
+- [Geist](https://vercel.com/font) — Sans, Serif, Mono, and Pixel
 
 ## Development
 

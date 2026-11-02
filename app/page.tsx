@@ -29,7 +29,7 @@ export default async function Home() {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-sm">
             <Beer className="h-5 w-5" aria-hidden />
           </span>
-          <span className="text-lg font-semibold tracking-tight">
+          <span className="font-pixel text-lg font-medium tracking-tight">
             Brew<span className="text-blue-600 dark:text-blue-400">Base</span>
           </span>
         </div>
@@ -45,7 +45,7 @@ export default async function Home() {
       </nav>
 
       <header className="mb-10 sm:mb-12 max-w-3xl">
-        <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-[1.05]">
+        <h1 className="font-serif text-4xl sm:text-6xl font-normal tracking-tight leading-[1.05]">
           Pick your Mac apps.
           <br />
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-500 dark:from-blue-400 dark:to-violet-400">
